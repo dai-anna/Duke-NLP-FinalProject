@@ -21,7 +21,7 @@ def filter_tweets(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def remove_usernames(data: pd.DataFrame) -> pd.DataFrame:
-    data["tweet"] = data["tweet"].str.replace(r"@[A-Za-z0-9_]+ ", "", regex=True)
+    data["tweet"] = data["tweet"].str.replace(r"@[A-Za-z0-9_]+\b", "", regex=True)
     return data
 
 
@@ -37,14 +37,17 @@ def remove_hashtags_and_cashtags(data: pd.DataFrame) -> pd.DataFrame:
     data["tweet"] = data["tweet"].str.replace(r"\$[A-Za-z0-9_]+\b", "", regex=True)
     return data
 
-def whitespaceencoder(data: pd.DataFrame) -> pd.DataFrame:
+def remove_multi_spaces(data: pd.DataFrame) -> pd.DataFrame:
+    data["tweet"] = data["tweet"].str.replace(r"\s+", " ", regex=True)
+    return data
+
+def whitespace_encode(data: pd.DataFrame):
     input = data['tweet'].tolist()
     encoder = WhitespaceEncoder(input)
     encoded_data = [encoder.encode(example) for example in input]
     with open("../artefacts/encoder.pickle", "wb") as file:
         joblib.dump(encoder, file)
-        
-    return encoded_data
+    print("Saved encoder to disk.")
     
 
 clean_df = (
@@ -53,6 +56,7 @@ clean_df = (
     .pipe(remove_usernames)
     .pipe(remove_urls)
     .pipe(remove_hashtags_and_cashtags)
+    .pipe(remove_multi_spaces)
 )
 
 #%%
@@ -64,6 +68,6 @@ clean_df.hashtag = clean_df.hashtag.astype("category")
 #%%
 clean_df.info()
 clean_df.to_parquet("../data/clean_tweets.parquet")
+
 #%%
-# for x in clean_df.tweet:
-#     print(x)
+_ = whitespace_encode(clean_df)
