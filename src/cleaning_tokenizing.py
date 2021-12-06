@@ -54,9 +54,9 @@ def remove_multi_spaces(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def whitespace_encode(data: pd.DataFrame) -> pd.DataFrame:
-    input = data["tweet"].tolist()
-    encoder = WhitespaceEncoder(input)
-    encoded_data = [encoder.encode(example) for example in input]
+    input_ = data["tweet"].tolist()
+    encoder = WhitespaceEncoder(input_, min_occurrences=2)
+    encoded_data = [encoder.encode(example) for example in input_]
     with open("../artefacts/encoder.pickle", "wb") as file:
         joblib.dump(encoder, file)
     print("Saved encoder to disk.")
