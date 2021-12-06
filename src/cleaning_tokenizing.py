@@ -20,8 +20,9 @@ def remove_urls(data: pd.DataFrame) -> pd.DataFrame:
     return data
 
 
-def remove_hashtags(data: pd.DataFrame) -> pd.DataFrame:
+def remove_hashtags_and_cashtags(data: pd.DataFrame) -> pd.DataFrame:
     data["tweet"] = data["tweet"].str.replace(r"#[A-Za-z0-9_]+\b", "", regex=True)
+    data["tweet"] = data["tweet"].str.replace(r"\$[A-Za-z0-9_]+\b", "", regex=True)
     return data
 
 
@@ -30,7 +31,7 @@ clean_df = (
     .pipe(filter_tweets)
     .pipe(remove_usernames)
     .pipe(remove_urls)
-    .pipe(remove_hashtags)
+    .pipe(remove_hashtags_and_cashtags)
 )
 clean_df
 
