@@ -6,3 +6,4 @@ scikit-learn
 git+https://github.com/twintproject/twint.git@origin/master#egg=twint
 black
 pytorch-nlp
+pyarrow

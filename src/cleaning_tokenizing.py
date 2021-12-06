@@ -3,6 +3,7 @@ import pandas as pd
 import joblib
 from torchnlp.encoders.text import WhitespaceEncoder
 from data_collecting import hashtags
+from string import punctuation
 
 #%%
 # merge all csvs into one dataframe
@@ -21,7 +22,7 @@ def filter_tweets(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def remove_usernames(data: pd.DataFrame) -> pd.DataFrame:
-    data["tweet"] = data["tweet"].str.replace(r"@[A-Za-z0-9_]+ ", "", regex=True)
+    data["tweet"] = data["tweet"].str.replace(r"@[A-Za-z0-9_]+\b", "", regex=True)
     return data
 
 
@@ -37,15 +38,30 @@ def remove_hashtags_and_cashtags(data: pd.DataFrame) -> pd.DataFrame:
     data["tweet"] = data["tweet"].str.replace(r"\$[A-Za-z0-9_]+\b", "", regex=True)
     return data
 
-def whitespaceencoder(data: pd.DataFrame) -> pd.DataFrame:
-    input = data['tweet'].tolist()
-    encoder = WhitespaceEncoder(input)
-    encoded_data = [encoder.encode(example) for example in input]
+
+def normalize_text(data: pd.DataFrame) -> pd.DataFrame:
+    """ To lowercase + strip punctuation + replace numbers"""
+    data["tweet"] = data["tweet"].str.lower()
+    data["tweet"] = data["tweet"].str.replace(
+        r"""[!"#\$%&'\(\)\*\+,-\./:;\<=\>?\[\]\^_`\{\|\}~]""", " ",regex=True
+    )
+    data["tweet"] = data["tweet"].str.replace(r"\d+", "<number>", regex=True)
+    return data
+
+
+def remove_multi_spaces(data: pd.DataFrame) -> pd.DataFrame:
+    data["tweet"] = data["tweet"].str.replace(r"\s+", " ", regex=True)
+    return data
+
+
+def whitespace_encode(data: pd.DataFrame) -> pd.DataFrame:
+    input_ = data["tweet"].tolist()
+    encoder = WhitespaceEncoder(input_, min_occurrences=2)
+    encoded_data = [encoder.encode(example) for example in input_]
     with open("../artefacts/encoder.pickle", "wb") as file:
         joblib.dump(encoder, file)
-        
-    return encoded_data
-    
+    print("Saved encoder to disk.")
+
 
 clean_df = (
     df.copy()
@@ -53,6 +69,8 @@ clean_df = (
     .pipe(remove_usernames)
     .pipe(remove_urls)
     .pipe(remove_hashtags_and_cashtags)
+    .pipe(normalize_text)
+    .pipe(remove_multi_spaces)
 )
 
 #%%
@@ -64,6 +82,6 @@ clean_df.hashtag = clean_df.hashtag.astype("category")
 #%%
 clean_df.info()
 clean_df.to_parquet("../data/clean_tweets.parquet")
+
 #%%
-# for x in clean_df.tweet:
-#     print(x)
+_ = whitespace_encode(clean_df)
