@@ -3,5 +3,5 @@ torch
 torchvision
 torchaudio
 scikit-learn
-# twint
+git+https://github.com/twintproject/twint.git@origin/master#egg=twint
 black
