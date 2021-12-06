@@ -5,7 +5,7 @@ We collect data on seven different topics on twitter to build an LDA model as we
 ## Hashtags
 1) crypto
 2) tesla
-3) goldenstatewarriors
+3) GSW
 4) formula1
 5) thanksgiving
 6) holidays
