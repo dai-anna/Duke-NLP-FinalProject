@@ -10,6 +10,7 @@ hashtags = [
     "covid19",
 ]
 
+
 def scrape_tweets_from_hashtags(hashtags):
 
     for _, trend in enumerate(hashtags):
