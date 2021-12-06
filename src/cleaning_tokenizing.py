@@ -43,8 +43,15 @@ clean_df = (
     .pipe(remove_urls)
     .pipe(remove_hashtags_and_cashtags)
 )
-clean_df
 
+#%%
+# convert tweet column to string and hashtag to category
+clean_df.tweet = clean_df.tweet.astype("string")
+clean_df.hashtag = clean_df.hashtag.astype("category")
+
+#%%
+clean_df.info()
+clean_df.to_parquet("../data/clean_tweets.parquet")
 #%%
 # for x in clean_df.tweet:
 #     print(x)
