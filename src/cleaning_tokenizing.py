@@ -1,5 +1,7 @@
 #%%
 import pandas as pd
+import joblib
+from torchnlp.encoders.text import WhitespaceEncoder
 from data_collecting import hashtags
 
 #%%
@@ -35,6 +37,15 @@ def remove_hashtags_and_cashtags(data: pd.DataFrame) -> pd.DataFrame:
     data["tweet"] = data["tweet"].str.replace(r"\$[A-Za-z0-9_]+\b", "", regex=True)
     return data
 
+def whitespaceencoder(data: pd.DataFrame) -> pd.DataFrame:
+    input = data['tweet'].tolist()
+    encoder = WhitespaceEncoder(input)
+    encoded_data = [encoder.encode(example) for example in input]
+    with open("../artefacts/encoder.pickle", "wb") as file:
+        joblib.dump(encoder, file)
+        
+    return encoded_data
+    
 
 clean_df = (
     df.copy()
@@ -48,6 +59,7 @@ clean_df = (
 # convert tweet column to string and hashtag to category
 clean_df.tweet = clean_df.tweet.astype("string")
 clean_df.hashtag = clean_df.hashtag.astype("category")
+
 
 #%%
 clean_df.info()
