@@ -1,7 +1,7 @@
 # Duke-NLP-FinalProject
 NLP final-project
 
-hashtags:
+Jashtags:
 1) crypto
 2) tesla
 3) goldenstatewarriors
