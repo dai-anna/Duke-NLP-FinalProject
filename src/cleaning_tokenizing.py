@@ -1,11 +1,21 @@
 #%%
 import pandas as pd
+from data_collecting import hashtags
 
-df = pd.read_csv("../data/twint_output_crypto.csv")
+#%%
+# merge all csvs into one dataframe
+csv_files = [
+    pd.read_csv(f"../data/twint_output_{ht}.csv", usecols=["tweet", "language"]).assign(
+        hashtag=f"{ht}"
+    )
+    for ht in hashtags
+]
+df = pd.concat(csv_files)
 
 #%%
 def filter_tweets(data: pd.DataFrame) -> pd.DataFrame:
-    return data.query("language == 'en'")
+    data = data.query("language == 'en'").drop(columns=["language"])
+    return data
 
 
 def remove_usernames(data: pd.DataFrame) -> pd.DataFrame:
@@ -35,7 +45,6 @@ clean_df = (
 )
 clean_df
 
-
 #%%
-for x in clean_df.tweet:
-    print(x)
+# for x in clean_df.tweet:
+#     print(x)
