@@ -3,6 +3,7 @@ import pandas as pd
 import joblib
 from torchnlp.encoders.text import WhitespaceEncoder
 from data_collecting import hashtags
+from string import punctuation
 
 #%%
 # merge all csvs into one dataframe
@@ -42,6 +43,13 @@ def remove_multi_spaces(data: pd.DataFrame) -> pd.DataFrame:
     return data
 
 def whitespace_encode(data: pd.DataFrame):
+def normalize_text(data: pd.DataFrame) -> pd.DataFrame:
+    """ To lowercase + strip punctuation """
+    data["tweet"] = data["tweet"].str.lower()
+    data["tweet"] = data["tweet"].str.replace(r"""[!"#\$%&'\(\)\*\+,-\./:;\<=\>?\[\]\^_`\{\|\}~]""", " ")
+    return data
+
+def whitespaceencoder(data: pd.DataFrame) -> pd.DataFrame:
     input = data['tweet'].tolist()
     encoder = WhitespaceEncoder(input)
     encoded_data = [encoder.encode(example) for example in input]
