@@ -1,15 +1,4 @@
 import twint
-import datetime
-import os
-import pandas as pd
-import re
-
-
-today = datetime.date.today()
-# today = "2021-11-15"  # Hardcode
-
-
-ROOT_DIR = "./"
 
 hashtags = [
     "crypto",
@@ -29,5 +18,5 @@ def scrape_tweets_from_hashtags(hashtags):
         c.Lang = "en"
         c.Limit = 10_000
         c.Store_csv = True
-        c.Output = f"twint_out_{trend}.csv"
+        c.Output = f"../data/twint_output_{trend}.csv"
         twint.run.Search(c)
