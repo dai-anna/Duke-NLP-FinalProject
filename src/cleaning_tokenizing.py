@@ -38,25 +38,29 @@ def remove_hashtags_and_cashtags(data: pd.DataFrame) -> pd.DataFrame:
     data["tweet"] = data["tweet"].str.replace(r"\$[A-Za-z0-9_]+\b", "", regex=True)
     return data
 
+
+def normalize_text(data: pd.DataFrame) -> pd.DataFrame:
+    """ To lowercase + strip punctuation """
+    data["tweet"] = data["tweet"].str.lower()
+    data["tweet"] = data["tweet"].str.replace(
+        r"""[!"#\$%&'\(\)\*\+,-\./:;\<=\>?\[\]\^_`\{\|\}~]""", " "
+    )
+    return data
+
+
 def remove_multi_spaces(data: pd.DataFrame) -> pd.DataFrame:
     data["tweet"] = data["tweet"].str.replace(r"\s+", " ", regex=True)
     return data
 
-def whitespace_encode(data: pd.DataFrame):
-def normalize_text(data: pd.DataFrame) -> pd.DataFrame:
-    """ To lowercase + strip punctuation """
-    data["tweet"] = data["tweet"].str.lower()
-    data["tweet"] = data["tweet"].str.replace(r"""[!"#\$%&'\(\)\*\+,-\./:;\<=\>?\[\]\^_`\{\|\}~]""", " ")
-    return data
 
-def whitespaceencoder(data: pd.DataFrame) -> pd.DataFrame:
-    input = data['tweet'].tolist()
+def whitespace_encode(data: pd.DataFrame) -> pd.DataFrame:
+    input = data["tweet"].tolist()
     encoder = WhitespaceEncoder(input)
     encoded_data = [encoder.encode(example) for example in input]
     with open("../artefacts/encoder.pickle", "wb") as file:
         joblib.dump(encoder, file)
     print("Saved encoder to disk.")
-    
+
 
 clean_df = (
     df.copy()
@@ -64,6 +68,7 @@ clean_df = (
     .pipe(remove_usernames)
     .pipe(remove_urls)
     .pipe(remove_hashtags_and_cashtags)
+    .pipe(normalize_text)
     .pipe(remove_multi_spaces)
 )
 
