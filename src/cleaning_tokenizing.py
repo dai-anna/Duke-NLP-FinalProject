@@ -40,11 +40,12 @@ def remove_hashtags_and_cashtags(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def normalize_text(data: pd.DataFrame) -> pd.DataFrame:
-    """ To lowercase + strip punctuation """
+    """ To lowercase + strip punctuation + replace numbers"""
     data["tweet"] = data["tweet"].str.lower()
     data["tweet"] = data["tweet"].str.replace(
-        r"""[!"#\$%&'\(\)\*\+,-\./:;\<=\>?\[\]\^_`\{\|\}~]""", " "
+        r"""[!"#\$%&'\(\)\*\+,-\./:;\<=\>?\[\]\^_`\{\|\}~]""", " ",regex=True
     )
+    data["tweet"] = data["tweet"].str.replace(r"\d+", "<number>", regex=True)
     return data
 
 
