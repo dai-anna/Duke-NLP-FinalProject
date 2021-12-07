@@ -1,10 +1,14 @@
 #%%
+# Import packages
 import pandas as pd
 import torch
 import torch.nn as nn
 import joblib
 from preprocessing_helpers import encode_dataframe
 from data_collecting import hashtags
+
+import os
+torch.set_num_threads(16)
 
 #%%
 # Load data from disk
@@ -25,8 +29,8 @@ xtest, ytest = encode_dataframe(encoder, data=test, mode="pytorch")
 # Specify hyperparameters
 embedding_dim = 32
 hidden_size = 64
-batch_size = 1024
-num_epochs = 500
+batch_size = 64
+num_epochs = 10
 hidden_dense_dim = 32
 
 #%%
@@ -76,12 +80,37 @@ softmax_model = nn.Sequential(
     nn.Softmax(),
 )
 
+class combined(nn.Module):
+    def __init__(self):
+        super(combined, self).__init__()
+        self.gru_model = gru_model
+        self.softmax_model = softmax_model
+
+    def forward(self, x):
+        x = self.gru_model(x)[1]
+        x = torch.cat((x[0], x[1]), dim=-1)
+        x = self.softmax_model(x)
+        return x
+
 # %%
 # Train the model
 optimizer = torch.optim.Adam(
-    list(gru_model.parameters()) + list(softmax_model.parameters())
+    list(gru_model.parameters()) + list(softmax_model.parameters()), lr=0.001
 )
 loss_function = nn.CrossEntropyLoss()
+
+# #%%
+# from torch_lr_finder import LRFinder
+# lr_finder = LRFinder(combined(), optimizer, loss_function, device="cpu")
+# lr_finder.range_test(train_loader, end_lr=100, num_iter=100)
+# lr_finder.plot() # to inspect the loss-learning rate graph
+# lr_finder.reset() # to reset the model and optimizer to their initial state
+
+#%%
+performance_metrics = {
+    "train_loss": [],
+    "val_loss": [],
+}
 for epoch in range(num_epochs):
     gru_model.train()
     current_epoch_losses = []
@@ -99,12 +128,17 @@ for epoch in range(num_epochs):
     gru_model.eval()
 
     y_pred_val = gru_model(val_dataset.x)[1]
-    # y_pred_val = y_pred_val.view(val_dataset.x.shape[0], -1)
     y_pred_val = torch.cat((y_pred_val[0], y_pred_val[1]), dim=-1)
     y_pred_val = softmax_model(y_pred_val)
     loss_val = loss_function(y_pred_val, val_dataset.y)
-    print(
-        f"Epoch {epoch} loss: {sum(current_epoch_losses)/len(current_epoch_losses)}, val loss: {loss_val.item()}"
-    )
 
+    avg_trainloss_over_batches = sum(current_epoch_losses)/len(current_epoch_losses)
+    print(
+        f"Epoch {epoch} loss: {avg_trainloss_over_batches}, val loss: {loss_val.item()}"
+    )
+    performance_metrics["train_loss"].append(avg_trainloss_over_batches)
+    performance_metrics["val_loss"].append(loss_val.item())
+
+# %%
+pd.DataFrame(performance_metrics).plot()
 # %%
