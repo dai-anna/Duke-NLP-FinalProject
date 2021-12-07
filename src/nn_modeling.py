@@ -26,15 +26,15 @@ num_epochs = 10
 
 #%%
 # Pad my input sequence with zeros
-xtrain = nn.utils.rnn.pad_sequence(sequences = xtrain, batch_first=False, padding_value=0.0)
-xval = nn.utils.rnn.pad_sequence(sequences = xval, batch_first=False, padding_value=0.0)
-xtest = nn.utils.rnn.pad_sequence(sequences = xtest, batch_first=False, padding_value=0.0)
+xtrain = nn.utils.rnn.pad_sequence(sequences = xtrain, batch_first=True, padding_value=0.0)
+xval = nn.utils.rnn.pad_sequence(sequences = xval, batch_first=True, padding_value=0.0)
+xtest = nn.utils.rnn.pad_sequence(sequences = xtest, batch_first=True, padding_value=0.0)
 
 #%%
 # Create data loader
 class dataset(torch.utils.data.Dataset):
     def __init__(self, x, y):
-        self.x = x
+        self.x = x.long()
         self.y = nn.functional.one_hot(torch.Tensor(y.cat.codes.values).long())
 
     def __getitem__(self, index):
@@ -77,6 +77,7 @@ loss_function = nn.CrossEntropyLoss()
 gru_model.train()
 for epoch in range(num_epochs):
     for i, (x, y) in enumerate(train_loader):
+        print(x)
         y_pred = gru_model(x)
         loss = loss_function(y_pred, y)
         loss.backward()
