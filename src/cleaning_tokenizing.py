@@ -106,8 +106,26 @@ clean_df.hashtag = clean_df.hashtag.astype("category")
 
 
 #%%
-clean_df.info()
+# clean_df.info()
 clean_df.to_parquet("../data/clean_tweets.parquet")
 
 #%%
-_ = whitespace_encode(clean_df)
+from sklearn.model_selection import train_test_split
+
+xtrain, xval, ytrain, yval = train_test_split(
+    clean_df["tweet"].to_frame(), clean_df["hashtag"], test_size=0.4, random_state=42
+)
+
+xval, xtest, yval, ytest = train_test_split(xval, yval, test_size=0.5, random_state=42)
+
+for x_ in (xtrain, xval, xtest):
+    print(x_.shape)
+
+#%%
+_ = whitespace_encode(xtrain)
+
+#%%
+pd.concat([xtrain, ytrain], axis=1).to_parquet("../data/train.parquet")
+pd.concat([xval, yval], axis=1).to_parquet("../data/val.parquet")
+pd.concat([xtest, ytest], axis=1).to_parquet("../data/test.parquet")
+print("Saved parquets to disk.")

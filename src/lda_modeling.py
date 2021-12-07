@@ -7,21 +7,12 @@ with open("../artefacts/encoder.pickle", "rb") as f:
     encoder: WhitespaceEncoder = joblib.load(f)
 
 df = pd.read_parquet("../data/clean_tweets.parquet")
-
-#%%
-df
-
-#%%
-encoded = [encoder.encode(tweet) for tweet in df.tweet]
-encoded[0]
-#%%
-[encoder.decode(x) for x in encoded]
-
-#%%
-print(encoder.vocab_size)
+encoded_tweets = [encoder.encode(tweet) for tweet in df.tweet]
+encoded_tweets = [" ".join(str(x) for x in encoded_tweets[idx].numpy()) for idx in range(len(encoded_tweets))]
 
 
 #%%
-with open("dump.txt", "w") as f:
-    for v in encoder.vocab:
-        f.write(v + "\n")
+from sklearn.feature_extraction.text import CountVectorizer
+
+cv = CountVectorizer()
+X = cv.fit_transform(encoded_tweets)
