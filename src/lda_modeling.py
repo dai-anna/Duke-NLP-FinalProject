@@ -27,7 +27,7 @@ for x_ in (xtrain, xtest):
     print(len(x_))
 
 #%%
-# ------------------ Count vectorize and fit model --------------------
+# ------------------ Vectorize data and fit model --------------------
 cv = CountVectorizer(vocabulary=encoder.token_to_index)
 xtrain_matrix = cv.transform(xtrain)
 xtest_matrix = cv.transform(xtest)
@@ -37,7 +37,7 @@ lda.fit(xtrain_matrix)
 
 
 #%%
-#------------------- Print top words per topic ---------------------
+# ------------------- Print top words per topic ---------------------
 top_k_per_topic = lda.components_.argsort(axis=1)[:, -30:]
 for idx, topic in enumerate(top_k_per_topic):
     print("=" * 20 + f"Topic #{idx}" + "=" * 20)
@@ -47,7 +47,7 @@ for idx, topic in enumerate(top_k_per_topic):
 
 #%%
 # ----------------- Sample words from one topic -------------------
-def sample_from_topice(topic_idx: int, n_samples: int):
+def sample_from_topic(topic_idx: int, n_samples: int):
     comp = lda.components_[topic_idx, :]
     comp = comp / comp.sum()
 
@@ -56,4 +56,4 @@ def sample_from_topice(topic_idx: int, n_samples: int):
     )
 
 
-sample_from_topice(5, 20)
+sample_from_topic(5, 20)
