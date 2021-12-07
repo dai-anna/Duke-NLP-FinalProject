@@ -16,3 +16,12 @@ encoded = [encoder.encode(tweet) for tweet in df.tweet]
 encoded[0]
 #%%
 [encoder.decode(x) for x in encoded]
+
+#%%
+print(encoder.vocab_size)
+
+
+#%%
+with open("dump.txt", "w") as f:
+    for v in encoder.vocab:
+        f.write(v + "\n")
