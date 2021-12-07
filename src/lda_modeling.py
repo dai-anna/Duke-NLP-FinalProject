@@ -10,7 +10,7 @@ from preprocessing_helpers import encode_dataframe
 with open("../artefacts/encoder.pickle", "rb") as f:
     encoder: WhitespaceEncoder = joblib.load(f)
 
-# load data 
+# load data
 train = pd.read_parquet("../data/train.parquet")
 val = pd.read_parquet("../data/val.parquet")
 test = pd.read_parquet("../data/test.parquet")
