@@ -4,6 +4,24 @@ import joblib
 from torchnlp.encoders.text import WhitespaceEncoder
 from data_collecting import hashtags
 from string import punctuation
+import re
+
+EMOJI_REGEX = re.compile(
+    "(["
+    "\U0001F1E0-\U0001F1FF"  # flags (iOS)
+    "\U0001F300-\U0001F5FF"  # symbols & pictographs
+    "\U0001F600-\U0001F64F"  # emoticons
+    "\U0001F680-\U0001F6FF"  # transport & map symbols
+    "\U0001F700-\U0001F77F"  # alchemical symbols
+    "\U0001F780-\U0001F7FF"  # Geometric Shapes Extended
+    "\U0001F800-\U0001F8FF"  # Supplemental Arrows-C
+    "\U0001F900-\U0001F9FF"  # Supplemental Symbols and Pictographs
+    "\U0001FA00-\U0001FA6F"  # Chess Symbols
+    "\U0001FA70-\U0001FAFF"  # Symbols and Pictographs Extended-A
+    "\U00002702-\U000027B0"  # Dingbats
+    "\U000024C2-\U0001F251"
+    "])"
+)
 
 #%%
 # merge all csvs into one dataframe
@@ -40,17 +58,24 @@ def remove_hashtags_and_cashtags(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def normalize_text(data: pd.DataFrame) -> pd.DataFrame:
-    """ To lowercase + strip punctuation + replace numbers"""
+    """To lowercase + strip punctuation + replace numbers"""
     data["tweet"] = data["tweet"].str.lower()
     data["tweet"] = data["tweet"].str.replace(
-        r"""[!"#\$%&'\(\)\*\+,-\./:;\<=\>?\[\]\^_`\{\|\}~]""", " ",regex=True
+        r"""[!"#\$%&'\(\)\*\+,-\./:;\<=\>?\[\]\^_`\{\|\}~“”’]""", " ", regex=True
     )
-    data["tweet"] = data["tweet"].str.replace(r"\d+", "<number>", regex=True)
+    data["tweet"] = data["tweet"].str.replace(r"\d+", " <number> ", regex=True)
+    return data
+
+
+def space_out_emojis(data: pd.DataFrame) -> pd.DataFrame:
+    data["tweet"] = data["tweet"].str.replace(
+        EMOJI_REGEX, r" \1 ", regex=True
+    )  # space before and after
     return data
 
 
 def remove_multi_spaces(data: pd.DataFrame) -> pd.DataFrame:
-    data["tweet"] = data["tweet"].str.replace(r"\s+", " ", regex=True)
+    data["tweet"] = data["tweet"].str.replace(r"\s+", " ", regex=True).str.strip()
     return data
 
 
@@ -70,6 +95,7 @@ clean_df = (
     .pipe(remove_urls)
     .pipe(remove_hashtags_and_cashtags)
     .pipe(normalize_text)
+    .pipe(space_out_emojis)
     .pipe(remove_multi_spaces)
 )
 
@@ -80,8 +106,26 @@ clean_df.hashtag = clean_df.hashtag.astype("category")
 
 
 #%%
-clean_df.info()
+# clean_df.info()
 clean_df.to_parquet("../data/clean_tweets.parquet")
 
 #%%
-_ = whitespace_encode(clean_df)
+from sklearn.model_selection import train_test_split
+
+xtrain, xval, ytrain, yval = train_test_split(
+    clean_df["tweet"].to_frame(), clean_df["hashtag"], test_size=0.4, random_state=42
+)
+
+xval, xtest, yval, ytest = train_test_split(xval, yval, test_size=0.5, random_state=42)
+
+for x_ in (xtrain, xval, xtest):
+    print(x_.shape)
+
+#%%
+_ = whitespace_encode(xtrain)
+
+#%%
+pd.concat([xtrain, ytrain], axis=1).to_parquet("../data/train.parquet")
+pd.concat([xval, yval], axis=1).to_parquet("../data/val.parquet")
+pd.concat([xtest, ytest], axis=1).to_parquet("../data/test.parquet")
+print("Saved parquets to disk.")
