@@ -61,14 +61,16 @@ def normalize_text(data: pd.DataFrame) -> pd.DataFrame:
     """To lowercase + strip punctuation + replace numbers"""
     data["tweet"] = data["tweet"].str.lower()
     data["tweet"] = data["tweet"].str.replace(
-        r"""[!"#\$%&'\(\)\*\+,-\./:;\<=\>?\[\]\^_`\{\|\}~“”]""", " ", regex=True
+        r"""[!"#\$%&'\(\)\*\+,-\./:;\<=\>?\[\]\^_`\{\|\}~“”’]""", " ", regex=True
     )
-    data["tweet"] = data["tweet"].str.replace(r"\d+", "<number>", regex=True)
+    data["tweet"] = data["tweet"].str.replace(r"\d+", " <number> ", regex=True)
     return data
 
 
 def space_out_emojis(data: pd.DataFrame) -> pd.DataFrame:
-    data["tweet"] = data["tweet"].str.replace(EMOJI_REGEX, r" \1 ", regex=True)  # space before and after
+    data["tweet"] = data["tweet"].str.replace(
+        EMOJI_REGEX, r" \1 ", regex=True
+    )  # space before and after
     return data
 
 
