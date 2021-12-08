@@ -24,31 +24,14 @@ xval, yval = encode_dataframe(encoder, data=val, mode="pytorch")
 xtest, ytest = encode_dataframe(encoder, data=test, mode="pytorch")
 
 # Pad my input sequence with zeros
-xtrain = nn.utils.rnn.pad_sequence(sequences=xtrain, batch_first=True, padding_value=0.0)
+xtrain = nn.utils.rnn.pad_sequence(
+    sequences=xtrain, batch_first=True, padding_value=0.0
+)
 xval = nn.utils.rnn.pad_sequence(sequences=xval, batch_first=True, padding_value=0.0)
 xtest = nn.utils.rnn.pad_sequence(sequences=xtest, batch_first=True, padding_value=0.0)
 
 #%%
-# Define Checkpoint callbacks
-model_checkpoint_loss = tf.keras.callbacks.ModelCheckpoint(
-    filepath="Duke-NLP-FinalProject/data/trained_model/by_accuracy/",
-    monitor="val_loss",
-    save_best_only=True,
-    save_weights_only=True,
-    mode="min",
-    save_freq="epoch",
-)
 
-model_checkpoint_acc = tf.keras.callbacks.ModelCheckpoint(
-    filepath="Duke-NLP-FinalProject/data/trained_model/by_loss/",
-    monitor="val_accuracy",
-    save_best_only=True,
-    save_weights_only=True,
-    mode="max",
-    save_freq="epoch",
-)
-
-load_best_path = "Duke-NLP-FinalProject/data/trained_model/by_accuracy/"
 #%%
 BATCH_SIZE = 64
 LEARNING_RATE = 10 ** -2.5
@@ -56,6 +39,7 @@ NUM_EPOCHS = 2
 
 
 def one_training_run(params: dict):
+    # --------------------- Param & Data setup ---------------------#
     EMBEDDING_DIM = params["embedding_dim"]
     HIDDEN_SIZE = params["hidden_size"]
     HIDDEN_DENSE_DIM = params["hidden_dense_dim"]
@@ -65,10 +49,11 @@ def one_training_run(params: dict):
     train_dataset = tf.data.Dataset.from_tensor_slices(
         (xtrain, ytrain.cat.codes.values)
     ).batch(BATCH_SIZE)
-    val_dataset = tf.data.Dataset.from_tensor_slices((xval, yval.cat.codes.values)).batch(
-        BATCH_SIZE
-    )
+    val_dataset = tf.data.Dataset.from_tensor_slices(
+        (xval, yval.cat.codes.values)
+    ).batch(BATCH_SIZE)
 
+    # --------------------- Define the model ---------------------#
     model = keras.Sequential(
         [
             keras.layers.Embedding(
@@ -89,7 +74,9 @@ def one_training_run(params: dict):
             ),
             keras.layers.Dropout(rate=DROPOUT_RATE),
             keras.layers.Dense(
-                7, activation="softmax", kernel_regularizer=keras.regularizers.l2(L2_REG)
+                7,
+                activation="softmax",
+                kernel_regularizer=keras.regularizers.l2(L2_REG),
             ),
         ]
     )
@@ -100,6 +87,28 @@ def one_training_run(params: dict):
         metrics=["accuracy"],
     )
 
+    # --------------------- Define Checkpoints ---------------------#
+    model_checkpoint_loss = tf.keras.callbacks.ModelCheckpoint(
+        filepath="Duke-NLP-FinalProject/data/trained_model/by_accuracy/",
+        monitor="val_loss",
+        save_best_only=True,
+        save_weights_only=True,
+        mode="min",
+        save_freq="epoch",
+    )
+
+    model_checkpoint_acc = tf.keras.callbacks.ModelCheckpoint(
+        filepath="Duke-NLP-FinalProject/data/trained_model/by_loss/",
+        monitor="val_accuracy",
+        save_best_only=True,
+        save_weights_only=True,
+        mode="max",
+        save_freq="epoch",
+    )
+
+    load_best_path = "Duke-NLP-FinalProject/data/trained_model/by_accuracy/"
+
+    # --------------------- Fit the model ---------------------#
     hist = model.fit(
         train_dataset,
         validation_data=val_dataset,
@@ -115,25 +124,33 @@ def one_training_run(params: dict):
 
 
 def objective(trial):
+    # --------------------- Search Space Definition ---------------------#
     embedding_dim = 2 ** trial.suggest_int("embedding_dim", 4, 6)
     hidden_size = 2 ** trial.suggest_int("hidden_size", 4, 8)
     hidden_dense_dim = 2 ** trial.suggest_int("hidden_dense_dim", 4, 8)
     dropout_rate = trial.suggest_uniform("dropout_rate", 0.0, 0.5)
     l2_reg = trial.suggest_float("l2_reg", 0.000000001, 0.5, log=True)
 
-    val_acc = one_training_run(params={
-        "embedding_dim": embedding_dim,
-        "hidden_size": hidden_size,
-        "hidden_dense_dim": hidden_dense_dim,
-        "dropout_rate": dropout_rate,
-        "l2_reg": l2_reg,
-    })
-    
+    # --------------------- Run ---------------------#
+    val_acc = one_training_run(
+        params={
+            "embedding_dim": embedding_dim,
+            "hidden_size": hidden_size,
+            "hidden_dense_dim": hidden_dense_dim,
+            "dropout_rate": dropout_rate,
+            "l2_reg": l2_reg,
+        }
+    )
+
     return val_acc
 
 
-study = optuna.create_study("sqlite:///tf_hyperparameter_study.db", direction="maximize")
-study.optimize(objective, n_trials=2)
+#%%
+# --------------------- Setup Optuna ---------------------#
+study = optuna.create_study(
+    "sqlite:///tf_hyperparameter_study.db", direction="maximize"
+)
+study.optimize(objective, n_trials=2)  # start studz
 print("-" * 80)
 print(f"Found best params {study.best_params}")
 
