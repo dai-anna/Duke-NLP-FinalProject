@@ -24,9 +24,7 @@ xval, yval = encode_dataframe(encoder, data=val, mode="pytorch")
 xtest, ytest = encode_dataframe(encoder, data=test, mode="pytorch")
 
 # Pad my input sequence with zeros
-xtrain = nn.utils.rnn.pad_sequence(
-    sequences=xtrain, batch_first=True, padding_value=0.0
-)
+xtrain = nn.utils.rnn.pad_sequence(sequences=xtrain, batch_first=True, padding_value=0.0)
 xval = nn.utils.rnn.pad_sequence(sequences=xval, batch_first=True, padding_value=0.0)
 xtest = nn.utils.rnn.pad_sequence(sequences=xtest, batch_first=True, padding_value=0.0)
 
@@ -49,9 +47,9 @@ def one_training_run(params: dict):
     train_dataset = tf.data.Dataset.from_tensor_slices(
         (xtrain, ytrain.cat.codes.values)
     ).batch(BATCH_SIZE)
-    val_dataset = tf.data.Dataset.from_tensor_slices(
-        (xval, yval.cat.codes.values)
-    ).batch(BATCH_SIZE)
+    val_dataset = tf.data.Dataset.from_tensor_slices((xval, yval.cat.codes.values)).batch(
+        BATCH_SIZE
+    )
 
     # --------------------- Define the model ---------------------#
     model = keras.Sequential(
@@ -88,22 +86,26 @@ def one_training_run(params: dict):
     )
 
     # --------------------- Define Checkpoints ---------------------#
-    model_checkpoint_loss = tf.keras.callbacks.ModelCheckpoint(
-        filepath="Duke-NLP-FinalProject/data/trained_model/by_accuracy/",
-        monitor="val_loss",
-        save_best_only=True,
-        save_weights_only=True,
-        mode="min",
-        save_freq="epoch",
-    )
+    # model_checkpoint_loss = tf.keras.callbacks.ModelCheckpoint(
+    #     filepath="Duke-NLP-FinalProject/data/trained_model/by_accuracy/",
+    #     monitor="val_loss",
+    #     save_best_only=True,
+    #     save_weights_only=True,
+    #     mode="min",
+    #     save_freq="epoch",
+    # )
 
-    model_checkpoint_acc = tf.keras.callbacks.ModelCheckpoint(
-        filepath="Duke-NLP-FinalProject/data/trained_model/by_loss/",
-        monitor="val_accuracy",
-        save_best_only=True,
-        save_weights_only=True,
-        mode="max",
-        save_freq="epoch",
+    # model_checkpoint_acc = tf.keras.callbacks.ModelCheckpoint(
+    #     filepath="Duke-NLP-FinalProject/data/trained_model/by_loss/",
+    #     monitor="val_accuracy",
+    #     save_best_only=True,
+    #     save_weights_only=True,
+    #     mode="max",
+    #     save_freq="epoch",
+    # )
+
+    early_stopping_cb = tf.keras.callbacks.EarlyStopping(
+        monitor="val_accuracy", patience=3, restore_best_weights=True
     )
 
     load_best_path = "Duke-NLP-FinalProject/data/trained_model/by_accuracy/"
@@ -113,10 +115,11 @@ def one_training_run(params: dict):
         train_dataset,
         validation_data=val_dataset,
         epochs=NUM_EPOCHS,
-        callbacks=[model_checkpoint_loss, model_checkpoint_acc],
+        # callbacks=[model_checkpoint_loss, model_checkpoint_acc],
+        callbacks=[early_stopping_cb],
     )
 
-    model.load_weights(load_best_path)
+    # model.load_weights(load_best_path)
 
     val_loss, val_accuracy = model.evaluate(val_dataset)
 
@@ -148,11 +151,13 @@ def objective(trial):
 #%%
 # --------------------- Setup Optuna ---------------------#
 
-CREATE_NEW_STUDY = False
+CREATE_NEW_STUDY = True
 
 if CREATE_NEW_STUDY:
     study = optuna.create_study(
-        "sqlite:///../data/tf_hyperparameter_study.db", direction="maximize"
+        "sqlite:///../data/tf_hyperparameter_study.db",
+        direction="maximize",
+        study_name="tf_study001",
     )
 else:
     study = optuna.load_study(
@@ -160,7 +165,7 @@ else:
         storage="sqlite:///../data/tf_hyperparameter_study.db",
     )
 
-study.optimize(objective, n_trials=10)  # start study
+study.optimize(objective, n_trials=50)  # start study
 print("-" * 80)
 print(f"Found best params {study.best_params}")
 
