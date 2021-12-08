@@ -33,7 +33,7 @@ xtest = nn.utils.rnn.pad_sequence(sequences=xtest, batch_first=True, padding_val
 #%%
 BATCH_SIZE = 64
 LEARNING_RATE = 10 ** -2.5
-NUM_EPOCHS = 20
+NUM_EPOCHS = 2
 
 
 def one_training_run(params: dict):
@@ -108,7 +108,7 @@ def one_training_run(params: dict):
         monitor="val_accuracy", patience=3, restore_best_weights=True
     )
 
-    load_best_path = "Duke-NLP-FinalProject/data/trained_model/by_accuracy/"
+    load_best_path = "../data/trained_model/by_accuracy/"
 
     # --------------------- Fit the model ---------------------#
     hist = model.fit(
