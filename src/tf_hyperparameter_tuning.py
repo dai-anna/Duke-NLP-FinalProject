@@ -35,7 +35,7 @@ xtest = nn.utils.rnn.pad_sequence(sequences=xtest, batch_first=True, padding_val
 #%%
 BATCH_SIZE = 64
 LEARNING_RATE = 10 ** -2.5
-NUM_EPOCHS = 2
+NUM_EPOCHS = 20
 
 
 def one_training_run(params: dict):
@@ -147,10 +147,20 @@ def objective(trial):
 
 #%%
 # --------------------- Setup Optuna ---------------------#
-study = optuna.create_study(
-    "sqlite:///../data/tf_hyperparameter_study.db", direction="maximize"
-)
-study.optimize(objective, n_trials=20)  # start study
+
+CREATE_NEW_STUDY = False
+
+if CREATE_NEW_STUDY:
+    study = optuna.create_study(
+        "sqlite:///../data/tf_hyperparameter_study.db", direction="maximize"
+    )
+else:
+    study = optuna.load_study(
+        "no-name-40d6e161-1892-4aa4-a5f1-22029bb1507e",
+        storage="sqlite:///../data/tf_hyperparameter_study.db",
+    )
+
+study.optimize(objective, n_trials=10)  # start study
 print("-" * 80)
 print(f"Found best params {study.best_params}")
 
