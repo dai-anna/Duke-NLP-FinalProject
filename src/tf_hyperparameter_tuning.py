@@ -148,9 +148,9 @@ def objective(trial):
 #%%
 # --------------------- Setup Optuna ---------------------#
 study = optuna.create_study(
-    "sqlite:///tf_hyperparameter_study.db", direction="maximize"
+    "sqlite:///../data/tf_hyperparameter_study.db", direction="maximize"
 )
-study.optimize(objective, n_trials=2)  # start studz
+study.optimize(objective, n_trials=20)  # start study
 print("-" * 80)
 print(f"Found best params {study.best_params}")
 
