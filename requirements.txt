@@ -8,3 +8,4 @@ black
 pytorch-nlp
 pyarrow
 optuna
+plotly
