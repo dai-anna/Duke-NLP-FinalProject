@@ -35,7 +35,7 @@ xtest = nn.utils.rnn.pad_sequence(sequences=xtest, batch_first=True, padding_val
 #%%
 BATCH_SIZE = 64
 LEARNING_RATE = 10 ** -2.5
-NUM_EPOCHS = 20
+NUM_EPOCHS = 2
 
 
 def one_training_run(params: dict):
@@ -89,7 +89,7 @@ def one_training_run(params: dict):
 
     # --------------------- Define Checkpoints ---------------------#
     model_checkpoint_loss = tf.keras.callbacks.ModelCheckpoint(
-        filepath="Duke-NLP-FinalProject/data/trained_model/by_accuracy/",
+        filepath="../data/trained_model/by_accuracy/",
         monitor="val_loss",
         save_best_only=True,
         save_weights_only=True,
@@ -98,7 +98,7 @@ def one_training_run(params: dict):
     )
 
     model_checkpoint_acc = tf.keras.callbacks.ModelCheckpoint(
-        filepath="Duke-NLP-FinalProject/data/trained_model/by_loss/",
+        filepath="../data/trained_model/by_loss/",
         monitor="val_accuracy",
         save_best_only=True,
         save_weights_only=True,
@@ -106,7 +106,7 @@ def one_training_run(params: dict):
         save_freq="epoch",
     )
 
-    load_best_path = "Duke-NLP-FinalProject/data/trained_model/by_accuracy/"
+    load_best_path = "../data/trained_model/by_accuracy/"
 
     # --------------------- Fit the model ---------------------#
     hist = model.fit(
@@ -160,7 +160,7 @@ else:
         storage="sqlite:///../data/tf_hyperparameter_study.db",
     )
 
-study.optimize(objective, n_trials=10)  # start study
+study.optimize(objective, n_trials=1)  # start study
 print("-" * 80)
 print(f"Found best params {study.best_params}")
 
