@@ -1,10 +1,15 @@
 #%%
 import pandas as pd
 import joblib
+from pandas.io.sql import has_table
 from torchnlp.encoders.text import WhitespaceEncoder
 from data_collecting import hashtags
 from string import punctuation
 import re
+
+from nltk.corpus import stopwords
+
+en_stops = set(stopwords.words("english"))
 
 EMOJI_REGEX = re.compile(
     "(["
@@ -23,20 +28,34 @@ EMOJI_REGEX = re.compile(
     "])"
 )
 
-#%%
-# merge all csvs into one dataframe
-csv_files = [
-    pd.read_csv(f"../data/twint_output_{ht}.csv", usecols=["tweet", "language"]).assign(
-        hashtag=f"{ht}"
-    )
-    for ht in hashtags
-]
-df = pd.concat(csv_files)
 
 #%%
-def filter_tweets(data: pd.DataFrame) -> pd.DataFrame:
-    data = data.query("language == 'en'").drop(columns=["language"])
-    return data
+# merge all csvs into one dataframe
+# csv_files = [
+#     pd.read_csv(f"../data/twint_output_{ht}.csv", usecols=["tweet", "language"]).assign(
+#         hashtag=f"{ht}"
+#     )
+#     for ht in hashtags
+# ]
+# df = pd.concat(csv_files)
+
+# %%
+# Merge all parquets into one dataframe
+# hashtag = "covid19"
+
+
+df = pd.concat(
+    pd.read_parquet(f"../data/api_{hashtag}.parquet")
+    .rename({"text": "tweet"}, axis=1)
+    .assign(hashtag=hashtag)
+    .reset_index(drop=True)
+    for hashtag in hashtags
+)
+
+#%%
+# def filter_tweets(data: pd.DataFrame) -> pd.DataFrame:
+#     data = data.query("language == 'en'").drop(columns=["language"])
+#     return data
 
 
 def remove_usernames(data: pd.DataFrame) -> pd.DataFrame:
@@ -58,12 +77,19 @@ def remove_hashtags_and_cashtags(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def normalize_text(data: pd.DataFrame) -> pd.DataFrame:
-    """To lowercase + strip punctuation + replace numbers"""
+    """To lowercase + strip punctuation + replace numbers + remove stopwords"""
     data["tweet"] = data["tweet"].str.lower()
     data["tweet"] = data["tweet"].str.replace(
         r"""[!"#\$%&'\(\)\*\+,-\./:;\<=\>?\[\]\^_`\{\|\}~“”’]""", " ", regex=True
     )
     data["tweet"] = data["tweet"].str.replace(r"\d+", " <number> ", regex=True)
+
+    # remove stopwords
+    data["tweet"] = (
+        data["tweet"]
+        .str.split()
+        .apply(lambda x: " ".join(word for word in x if word not in en_stops))
+    )
     return data
 
 
@@ -90,7 +116,7 @@ def whitespace_encode(data: pd.DataFrame) -> pd.DataFrame:
 
 clean_df = (
     df.copy()
-    .pipe(filter_tweets)
+    # .pipe(filter_tweets)
     .pipe(remove_usernames)
     .pipe(remove_urls)
     .pipe(remove_hashtags_and_cashtags)
