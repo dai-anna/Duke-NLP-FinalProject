@@ -33,7 +33,7 @@ xtest = nn.utils.rnn.pad_sequence(sequences=xtest, batch_first=True, padding_val
 #%%
 BATCH_SIZE = 64
 LEARNING_RATE = 10 ** -2.5
-NUM_EPOCHS = 2
+NUM_EPOCHS = 20
 
 
 def one_training_run(params: dict):
