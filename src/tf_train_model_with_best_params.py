@@ -76,20 +76,6 @@ synth_val_dataset = tf.data.Dataset.from_tensor_slices((xval, yval.cat.codes.val
     BATCH_SIZE
 )
 
-from learningrate_rangetest import LRFinder
-
-lr_finder = LRFinder(model)
-lr_finder.find(
-    synth_train_dataset,
-    start_lr=0.0001,
-    end_lr=1,
-    batch_size=BATCH_SIZE,
-    epochs=1,
-    steps_per_epoch=np.ceil(len(xtrain) / BATCH_SIZE),
-)
-
-lr_finder.plot()
-
 #%%
 # Decide on learning rate based on plot HERE:
 LEARNING_RATE = 10 ** -2.5
