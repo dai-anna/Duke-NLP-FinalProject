@@ -9,15 +9,33 @@ import joblib
 from preprocessing_helpers import *
 from data_collecting import hashtags
 from tensorflow import keras
+import os
+
+try:
+    import boto3
+
+    s3 = boto3.resource(
+        "s3",
+        region_name="us-east-1",
+        aws_secret_access_key=os.getenv("AWS_SECRET_AK"),
+        aws_access_key_id=os.getenv("AWS_AK"),
+    )
+    bucket = s3.Bucket("ids703-nlp-finalproject")
+    SAVE_TO_S3 = True
+    print("[INFO] S3 connection successful.")
+except:
+    print("[ERROR] Could not connect to S3! Only saving locally.")
+    SAVE_TO_S3 = False
 
 
 #%%
 # Load data from disk
 encoder = joblib.load("../artefacts/encoder.pickle")
 
-train = pd.read_parquet("../data/train.parquet")
-val = pd.read_parquet("../data/val.parquet")
-test = pd.read_parquet("../data/test.parquet")
+# TODO: train on synth_data first
+train = pd.read_parquet("../data/synth_train.parquet")
+val = pd.read_parquet("../data/synth_val.parquet")
+test = pd.read_parquet("../data/synth_test.parquet")
 
 xtrain, ytrain = encode_dataframe(encoder, data=train, mode="pytorch")
 xval, yval = encode_dataframe(encoder, data=val, mode="pytorch")
@@ -36,13 +54,53 @@ LEARNING_RATE = 10 ** -2.5
 NUM_EPOCHS = 20
 
 
+def get_compiled_model(
+    embedding_dim, hidden_size, hidden_dense_dim, dropout_rate, l2_reg, learning_rate
+):
+    # --------------------- Define the model ---------------------#
+    model = keras.Sequential(
+        [
+            keras.layers.Embedding(
+                input_dim=encoder.vocab_size, output_dim=embedding_dim
+            ),
+            keras.layers.Bidirectional(
+                keras.layers.GRU(
+                    hidden_size,
+                    return_sequences=False,
+                    kernel_regularizer=keras.regularizers.l2(l2_reg),
+                )
+            ),
+            keras.layers.Dropout(rate=dropout_rate),
+            keras.layers.Dense(
+                units=hidden_dense_dim,
+                activation="relu",
+                kernel_regularizer=keras.regularizers.l2(l2_reg),
+            ),
+            keras.layers.Dropout(rate=dropout_rate),
+            keras.layers.Dense(
+                7,
+                activation="softmax",
+                kernel_regularizer=keras.regularizers.l2(l2_reg),
+            ),
+        ]
+    )
+
+    model.compile(
+        loss="sparse_categorical_crossentropy",
+        optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
+        metrics=["accuracy"],
+    )
+
+    return model
+
+
 def one_training_run(params: dict):
     # --------------------- Param & Data setup ---------------------#
-    EMBEDDING_DIM = params["embedding_dim"]
-    HIDDEN_SIZE = params["hidden_size"]
-    HIDDEN_DENSE_DIM = params["hidden_dense_dim"]
-    DROPOUT_RATE = params["dropout_rate"]
-    L2_REG = params["l2_reg"]
+    # EMBEDDING_DIM = params["embedding_dim"]
+    # HIDDEN_SIZE = params["hidden_size"]
+    # HIDDEN_DENSE_DIM = params["hidden_dense_dim"]
+    # DROPOUT_RATE = params["dropout_rate"]
+    # L2_REG = params["l2_reg"]
 
     train_dataset = tf.data.Dataset.from_tensor_slices(
         (xtrain, ytrain.cat.codes.values)
@@ -51,75 +109,19 @@ def one_training_run(params: dict):
         BATCH_SIZE
     )
 
-    # --------------------- Define the model ---------------------#
-    model = keras.Sequential(
-        [
-            keras.layers.Embedding(
-                input_dim=encoder.vocab_size, output_dim=EMBEDDING_DIM
-            ),
-            keras.layers.Bidirectional(
-                keras.layers.GRU(
-                    HIDDEN_SIZE,
-                    return_sequences=False,
-                    kernel_regularizer=keras.regularizers.l2(L2_REG),
-                )
-            ),
-            keras.layers.Dropout(rate=DROPOUT_RATE),
-            keras.layers.Dense(
-                units=HIDDEN_DENSE_DIM,
-                activation="relu",
-                kernel_regularizer=keras.regularizers.l2(L2_REG),
-            ),
-            keras.layers.Dropout(rate=DROPOUT_RATE),
-            keras.layers.Dense(
-                7,
-                activation="softmax",
-                kernel_regularizer=keras.regularizers.l2(L2_REG),
-            ),
-        ]
-    )
-
-    model.compile(
-        loss="sparse_categorical_crossentropy",
-        optimizer=keras.optimizers.Adam(learning_rate=LEARNING_RATE),
-        metrics=["accuracy"],
-    )
-
-    # --------------------- Define Checkpoints ---------------------#
-    # model_checkpoint_loss = tf.keras.callbacks.ModelCheckpoint(
-    #     filepath="Duke-NLP-FinalProject/data/trained_model/by_accuracy/",
-    #     monitor="val_loss",
-    #     save_best_only=True,
-    #     save_weights_only=True,
-    #     mode="min",
-    #     save_freq="epoch",
-    # )
-
-    # model_checkpoint_acc = tf.keras.callbacks.ModelCheckpoint(
-    #     filepath="Duke-NLP-FinalProject/data/trained_model/by_loss/",
-    #     monitor="val_accuracy",
-    #     save_best_only=True,
-    #     save_weights_only=True,
-    #     mode="max",
-    #     save_freq="epoch",
-    # )
+    model = get_compiled_model(**params, learning_rate=LEARNING_RATE)
 
     early_stopping_cb = tf.keras.callbacks.EarlyStopping(
         monitor="val_accuracy", patience=3, restore_best_weights=True
     )
-
-    load_best_path = "../data/trained_model/by_accuracy/"
 
     # --------------------- Fit the model ---------------------#
     hist = model.fit(
         train_dataset,
         validation_data=val_dataset,
         epochs=NUM_EPOCHS,
-        # callbacks=[model_checkpoint_loss, model_checkpoint_acc],
         callbacks=[early_stopping_cb],
     )
-
-    # model.load_weights(load_best_path)
 
     val_loss, val_accuracy = model.evaluate(val_dataset)
 
@@ -135,6 +137,9 @@ def objective(trial):
     l2_reg = trial.suggest_float("l2_reg", 0.000000001, 0.5, log=True)
 
     # --------------------- Run ---------------------#
+
+    return np.random.rand()
+
     val_acc = one_training_run(
         params={
             "embedding_dim": embedding_dim,
@@ -151,28 +156,27 @@ def objective(trial):
 #%%
 # --------------------- Setup Optuna ---------------------#
 
-CREATE_NEW_STUDY = True
+if __name__ == "__main__":
+    CREATE_NEW_STUDY = False
+    if CREATE_NEW_STUDY:
+        study = optuna.create_study(
+            "sqlite:///../data/tf_hyperparameter_study.db",
+            direction="maximize",
+            study_name="tf_study001",
+        )
+    else:
+        study = optuna.load_study(
+            "tf_study001",
+            storage="sqlite:///../data/tf_hyperparameter_study.db",
+        )
 
-if CREATE_NEW_STUDY:
-    study = optuna.create_study(
-        "sqlite:///../data/tf_hyperparameter_study.db",
-        direction="maximize",
-        study_name="tf_study001",
-    )
-else:
-    study = optuna.load_study(
-        "no-name-40d6e161-1892-4aa4-a5f1-22029bb1507e",
-        storage="sqlite:///../data/tf_hyperparameter_study.db",
-    )
+    study.optimize(objective, n_trials=50)  # start study
+    print("-" * 80)
+    print(f"Found best params {study.best_params}")
 
-study.optimize(objective, n_trials=50)  # start study
-print("-" * 80)
-print(f"Found best params {study.best_params}")
-
-
-# %%
-from optuna.visualization import plot_parallel_coordinate
-
-plot_parallel_coordinate(study)
-
-# %%
+    # save study to s3
+    if SAVE_TO_S3:
+        bucket.upload_file(
+            "../data/tf_hyperparameter_study.db", "artefacts/tf_hyperparameter_study.db"
+        )
+    print("[INFO] Study saved to S3")

@@ -30,7 +30,11 @@ def scrape_tweets_from_hashtags(hashtags):
 
 
 def pull_tweets_for_hashtag(hashtag):
-    """Pull tweets using Twitter API"""
+    """
+    Pull tweets using Twitter API.
+    IMPORTANT: Supply your own Twitter API Bearer Token as the TWITTER_BEARER environment variable.
+    
+    """
 
     result_list = []
 

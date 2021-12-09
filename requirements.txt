@@ -10,3 +10,4 @@ pyarrow
 optuna
 plotly
 nbformat
+boto3
