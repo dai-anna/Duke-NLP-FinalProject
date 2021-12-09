@@ -155,7 +155,7 @@ def objective(trial):
 # --------------------- Setup Optuna ---------------------#
 
 if __name__ == "__main__":
-    CREATE_NEW_STUDY = False
+    CREATE_NEW_STUDY = True
     if CREATE_NEW_STUDY:
         study = optuna.create_study(
             "sqlite:///../artefacts/tf_hyperparameter_study.db",
