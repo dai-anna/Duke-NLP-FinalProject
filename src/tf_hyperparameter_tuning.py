@@ -138,8 +138,6 @@ def objective(trial):
 
     # --------------------- Run ---------------------#
 
-    return np.random.rand()
-
     val_acc = one_training_run(
         params={
             "embedding_dim": embedding_dim,
@@ -160,14 +158,14 @@ if __name__ == "__main__":
     CREATE_NEW_STUDY = False
     if CREATE_NEW_STUDY:
         study = optuna.create_study(
-            "sqlite:///../data/tf_hyperparameter_study.db",
+            "sqlite:///../artefacts/tf_hyperparameter_study.db",
             direction="maximize",
             study_name="tf_study001",
         )
     else:
         study = optuna.load_study(
             "tf_study001",
-            storage="sqlite:///../data/tf_hyperparameter_study.db",
+            storage="sqlite:///../artefacts/tf_hyperparameter_study.db",
         )
 
     study.optimize(objective, n_trials=50)  # start study
@@ -177,6 +175,6 @@ if __name__ == "__main__":
     # save study to s3
     if SAVE_TO_S3:
         bucket.upload_file(
-            "../data/tf_hyperparameter_study.db", "artefacts/tf_hyperparameter_study.db"
+            "../artefacts/tf_hyperparameter_study.db", "artefacts/tf_hyperparameter_study.db"
         )
     print("[INFO] Study saved to S3")
