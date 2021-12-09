@@ -117,4 +117,5 @@ pd.DataFrame(hist.history)[["loss", "val_loss"]].plot(figsize=(8, 5))
 model.save_weights("../artefacts/model_synthdata.hdf5")
 
 if SAVE_TO_S3:
-    bucket.upload_file("../artefacts/model_synthdata.tf", "artefacts/model_synthdata.tf")
+    bucket.upload_file("../artefacts/model_synthdata.hdf5", "artefacts/model_synthdata.hdf5")
+print("[INFO] Model saved to disk & uploaded to S3.")
