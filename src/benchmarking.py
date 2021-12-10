@@ -70,7 +70,7 @@ model.load_weights("../artefacts/model_synthdata.hdf5")
 # --------------------------- Synth only model benchmarks ---------------------------
 #%%
 def do_benchmark_and_save(model, xtest, ytest, tex_output_path, caption):
-    """ Conducts benchmark on test set and saves results to tex file. """
+    """Conducts benchmark on test set and saves results to tex file."""
 
     lda_topic_real_topic_mapper = {
         "0": "thanksgiving",  # bad, mixed with holidays, stock market, crypto
@@ -101,9 +101,16 @@ def do_benchmark_and_save(model, xtest, ytest, tex_output_path, caption):
             buf=f,
             escape=False,
             index=True,
-            bold_rows=True,
-            caption=caption,
+            bold_rows=False,
         )
+
+    # Ghetto way to get the caption to appear under the table
+    with open(tex_output_path, "r") as f:
+        content = f.readlines()
+        content.insert(-1, "\\caption{" + caption + "}\n")
+
+    with open(tex_output_path, "w") as f:
+        f.writelines(content)
 
 
 #%%
@@ -165,3 +172,6 @@ do_benchmark_and_save(
     "../report/benchmark_outputs/synthandreal_model_classificationreport_realdata.tex",
     "Benchmark results of neural net (trained on synthetic data and real data) on real data",
 )
+
+#%%
+# TODO: Benchmark model that's only been trained on real data
