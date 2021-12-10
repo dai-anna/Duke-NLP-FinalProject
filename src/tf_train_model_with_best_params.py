@@ -74,6 +74,11 @@ assert not (CONTINUE_ON_REAL and JUST_ON_REAL)
 assert TRAIN_ON_SYNTHETIC if CONTINUE_ON_REAL else True
 
 #%%
+early_stopping_cb = tf.keras.callbacks.EarlyStopping(
+    monitor="val_accuracy", patience=3, restore_best_weights=True
+)
+
+#%%
 # ----------------------------------------- Synthetic Data -----------------------------------------
 if TRAIN_ON_SYNTHETIC:
     synth_train_dataset = tf.data.Dataset.from_tensor_slices(
@@ -83,16 +88,11 @@ if TRAIN_ON_SYNTHETIC:
         (xval, yval.cat.codes.values)
     ).batch(BATCH_SIZE)
 
-    #%%
+
     # Decide on learning rate based on plot HERE:
     LEARNING_RATE = 10 ** -2.5
     model = get_compiled_model(**FINAL_PARAMS, learning_rate=LEARNING_RATE)
 
-    #%%
-    # train model on synth data
-    early_stopping_cb = tf.keras.callbacks.EarlyStopping(
-        monitor="val_accuracy", patience=3, restore_best_weights=True
-    )
 
     # --------------------- Fit the model ---------------------#
     REFIT_MODEL = False

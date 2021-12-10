@@ -166,4 +166,37 @@ do_benchmark_and_save(
 )
 
 #%%
+# --------------------------- Loading JUST real Model ---------------------------
+
 # TODO: Benchmark model that's only been trained on real data
+FINAL_PARAMS = {
+    "embedding_dim": 64,
+    "hidden_size": 48,
+    "hidden_dense_dim": 112,
+    "dropout_rate": 0.25,
+    "l2_reg": 2.081445e-08,
+}
+
+model = get_compiled_model(**FINAL_PARAMS, learning_rate=LEARNING_RATE)
+bucket.download_file(
+    "artefacts/model_just_realdata.hdf5",
+    "../artefacts/model_just_realdata.hdf5",
+)
+model.load_weights("../artefacts/model_just_realdata.hdf5")
+
+do_benchmark_and_save(
+    model,
+    synth_xtest,
+    synth_ytest,
+    "../report/benchmark_outputs/justreal_model_classificationreport_synthdata.tex",
+    "Benchmark results of neural net (trained on synthetic data and real data) on synthetic data",
+)
+
+#%%
+do_benchmark_and_save(
+    model,
+    xtest,
+    ytest,
+    "../report/benchmark_outputs/justreal_model_classificationreport_realdata.tex",
+    "Benchmark results of neural net (trained on synthetic data and real data) on real data",
+)
