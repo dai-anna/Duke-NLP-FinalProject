@@ -33,7 +33,6 @@ except:
 # Load data from disk
 encoder = joblib.load("../artefacts/encoder.pickle")
 
-# TODO: train on synth_data first
 synth_train = pd.read_parquet("../data/synth_train.parquet")
 synth_val = pd.read_parquet("../data/synth_val.parquet")
 synth_test = pd.read_parquet("../data/synth_test.parquet")
