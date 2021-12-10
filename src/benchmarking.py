@@ -104,14 +104,6 @@ def do_benchmark_and_save(model, xtest, ytest, tex_output_path, caption):
             bold_rows=False,
         )
 
-    # Ghetto way to get the caption to appear under the table
-    with open(tex_output_path, "r") as f:
-        content = f.readlines()
-        content.insert(-1, "\\caption{" + caption + "}\n")
-
-    with open(tex_output_path, "w") as f:
-        f.writelines(content)
-
 
 #%%
 do_benchmark_and_save(
