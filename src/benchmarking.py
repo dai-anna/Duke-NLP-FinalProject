@@ -9,6 +9,7 @@ from preprocessing_helpers import *
 from data_collecting import hashtags
 from tensorflow import keras
 import os
+from sklearn.metrics import classification_report
 
 #%%
 try:
@@ -46,6 +47,7 @@ xtest = nn.utils.rnn.pad_sequence(sequences=xtest, batch_first=True, padding_val
 
 
 #%%
+# --------------------------- Loading Synth only Model ---------------------------
 from tf_hyperparameter_tuning import get_compiled_model
 
 BATCH_SIZE = 64
@@ -65,70 +67,101 @@ bucket.download_file(
 )
 model.load_weights("../artefacts/model_synthdata.hdf5")
 
+# --------------------------- Synth only model benchmarks ---------------------------
 #%%
+def do_benchmark_and_save(model, xtest, ytest, tex_output_path, caption):
+    """ Conducts benchmark on test set and saves results to tex file. """
+
+    lda_topic_real_topic_mapper = {
+        "0": "thanksgiving",  # bad, mixed with holidays, stock market, crypto
+        "1": "formula1",  # very good
+        "2": "covid",  # => general stock market?
+        "3": "championsleague",  # + covid19
+        "4": "crypto",  # good
+        "5": "tesla",  # good
+        "6": "holidays",  # + covid
+    }
+
+    raw_preds = model.predict(xtest.numpy())
+    preds = raw_preds.argmax(axis=1)
+
+    # collect results in dataframe
+    benchmark_df = (
+        pd.DataFrame(
+            classification_report(preds, ytest.cat.codes.values, output_dict=True)
+        )[[str(x) for x in range(7)]]
+        .rename(lda_topic_real_topic_mapper, axis=1)
+        .round(3)
+        .T.assign(support=lambda d: d["support"].astype("int"))
+    )
+
+    # save
+    with open(tex_output_path, "w") as f:
+        benchmark_df.to_latex(
+            buf=f,
+            escape=False,
+            index=True,
+            bold_rows=True,
+            caption=caption,
+        )
+
 
 #%%
-from sklearn.metrics import classification_report
+do_benchmark_and_save(
+    model,
+    synth_xtest,
+    synth_ytest,
+    "../report/benchmark_outputs/synth_only_model_classificationreport_synthdata.tex",
+    "Benchmark results of neural net (trained on synthetic data only) on synthetic data",
+)
 
-lda_topic_real_topic_mapper = {
-    "0": "thanksgiving",  # bad, mixed with holidays, stock market, crypto
-    "1": "formula1",  # very good
-    "2": "covid",  # => general stock market?
-    "3": "championsleague",  # + covid19
-    "4": "crypto",  # good
-    "5": "tesla",  # good
-    "6": "holidays",  # + covid
+#%%
+do_benchmark_and_save(
+    model,
+    xtest,
+    ytest,
+    "../report/benchmark_outputs/synth_only_model_classificationreport_realdata.tex",
+    "Benchmark results of neural net (trained on synthetic data only) on real data",
+)
+
+
+#%%
+# --------------------------- Loading Synth+real Model ---------------------------
+from tf_hyperparameter_tuning import get_compiled_model
+
+BATCH_SIZE = 64
+LEARNING_RATE = 10 ** -2.5
+NUM_EPOCHS = 20
+FINAL_PARAMS = {
+    "embedding_dim": 2 ** 5,
+    "hidden_size": 2 ** 6,
+    "hidden_dense_dim": 2 ** 6,
+    "dropout_rate": 0.1,
+    "l2_reg": 0,
 }
 
+model = get_compiled_model(**FINAL_PARAMS, learning_rate=LEARNING_RATE)
+bucket.download_file(
+    "artefacts/model_synthdata_and_realdata.hdf5",
+    "../artefacts/model_synthdata_and_realdata.hdf5",
+)
+model.load_weights("../artefacts/model_synthdata_and_realdata.hdf5")
 
 #%%
-# on synth data
-raw_preds = model.predict(synth_xtest.numpy())
-preds = raw_preds.argmax(axis=1)
-
-synth_model_df = (
-    pd.DataFrame(
-        classification_report(preds, synth_ytest.cat.codes.values, output_dict=True)
-    )[[str(x) for x in range(7)]]
-    .rename(lda_topic_real_topic_mapper, axis=1)
-    .round(3)
-    .T.assign(support=lambda d: d["support"].astype("int"))
+# --------------------------- Synth+real model benchmarks ---------------------------
+do_benchmark_and_save(
+    model,
+    synth_xtest,
+    synth_ytest,
+    "../report/benchmark_outputs/synthandreal_model_classificationreport_synthdata.tex",
+    "Benchmark results of neural net (trained on synthetic data and real data) on synthetic data",
 )
-synth_model_df
-
-with open(
-    "../report/benchmark_outputs/synth_only_model_classificationreport_synthdata.tex", "w"
-) as f:
-    synth_model_df.to_latex(
-        buf=f,
-        escape=False,
-        index=True,
-        bold_rows=True,
-        caption="Benchmark results of neural net (trained on synthetic data only) on synthetic data",
-    )
 
 #%%
-# on real data
-raw_preds = model.predict(xtest.numpy())
-preds = raw_preds.argmax(axis=1)
-
-model_df = (
-    pd.DataFrame(classification_report(preds, ytest.cat.codes.values, output_dict=True))[
-        [str(x) for x in range(7)]
-    ]
-    .rename(lda_topic_real_topic_mapper, axis=1)
-    .round(3)
-    .T.assign(support=lambda d: d["support"].astype("int"))
+do_benchmark_and_save(
+    model,
+    xtest,
+    ytest,
+    "../report/benchmark_outputs/synthandreal_model_classificationreport_realdata.tex",
+    "Benchmark results of neural net (trained on synthetic data and real data) on real data",
 )
-model_df
-
-with open(
-    "../report/benchmark_outputs/synth_only_model_classificationreport_realdata.tex", "w"
-) as f:
-    model_df.to_latex(
-        buf=f,
-        escape=False,
-        index=True,
-        bold_rows=True,
-        caption="Benchmark results of neural net (trained on synthetic data only) on real data",
-    )
