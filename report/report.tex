@@ -1,4 +1,5 @@
 \documentclass[11pt]{article}
+\usepackage{booktabs}
 
 \title{IDS703 Final Project Report}
 \author{Anna Dai, Satvik Kishore, Moritz Wilksch}
@@ -14,15 +15,25 @@
 \subsection{Generative Model}
 
 
+
 \subsection{Discriminative Model}
 - network description
-- hyperparameter tuning
+- hyperparameter tuning on synth data
+- application to real
+- transfer learning on real data
+
+- compare to model that has ONLY been trained on real?
 
 \section{Results}
 \subsection{Benchmarking on Synthetic Data}
+
+\begin{center}
+\input{./benchmark_outputs/synth_only_model_classificationreport.tex}	
+\end{center}
 
 
 \subsection{Benchmarking on Real Data}
 
 \section{Conclusion}
+
 \end{document}
