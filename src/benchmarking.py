@@ -95,9 +95,19 @@ lda_topic_real_topic_mapper = {
 }
 
 
-synth_model_df = pd.DataFrame(
-    classification_report(preds, synth_ytest.cat.codes.values, output_dict=True)
-)[[str(x) for x in range(7)]].rename(lda_topic_real_topic_mapper, axis=1)
+synth_model_df = (
+    pd.DataFrame(
+        classification_report(preds, synth_ytest.cat.codes.values, output_dict=True)
+    )[[str(x) for x in range(7)]]
+    .rename(lda_topic_real_topic_mapper, axis=1)
+    .round(3)
+    .T.assign(support=lambda d: d["support"].astype("int"))
+)
+synth_model_df
 
-with open("../report/benchmark_outputs/synth_only_model_classificationreport.tex", "w") as f:
+
+#%%
+with open(
+    "../report/benchmark_outputs/synth_only_model_classificationreport.tex", "w"
+) as f:
     synth_model_df.to_latex(buf=f, escape=False, index=True)
