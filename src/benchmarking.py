@@ -107,4 +107,10 @@ synth_model_df
 with open(
     "../report/benchmark_outputs/synth_only_model_classificationreport.tex", "w"
 ) as f:
-    synth_model_df.to_latex(buf=f, escape=False, index=True)
+    synth_model_df.to_latex(
+        buf=f,
+        escape=False,
+        index=True,
+        bold_rows=True,
+        caption="Benchmark results of neural net on synthetic data",
+    )
