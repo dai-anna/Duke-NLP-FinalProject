@@ -47,7 +47,7 @@ xtest = nn.utils.rnn.pad_sequence(sequences=xtest, batch_first=True, padding_val
 #%%
 BATCH_SIZE = 64
 LEARNING_RATE = 10 ** -2.5
-NUM_EPOCHS = 1
+NUM_EPOCHS = 20
 
 
 #%%

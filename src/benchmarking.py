@@ -32,24 +32,17 @@ except:
 # Load data from disk
 encoder = joblib.load("../artefacts/encoder.pickle")
 
-synth_train = pd.read_parquet("../data/synth_train.parquet")
-synth_val = pd.read_parquet("../data/synth_val.parquet")
+# synth data
 synth_test = pd.read_parquet("../data/synth_test.parquet")
-
-synth_xtrain, synth_ytrain = encode_dataframe(encoder, data=synth_train, mode="pytorch")
-synth_xval, synth_yval = encode_dataframe(encoder, data=synth_val, mode="pytorch")
 synth_xtest, synth_ytest = encode_dataframe(encoder, data=synth_test, mode="pytorch")
-
-# Pad my input sequence with zeros
-synth_xtrain = nn.utils.rnn.pad_sequence(
-    sequences=synth_xtrain, batch_first=True, padding_value=0.0
-)
-synth_xval = nn.utils.rnn.pad_sequence(
-    sequences=synth_xval, batch_first=True, padding_value=0.0
-)
 synth_xtest = nn.utils.rnn.pad_sequence(
     sequences=synth_xtest, batch_first=True, padding_value=0.0
 )
+
+# real data
+test = pd.read_parquet("../data/test.parquet")
+xtest, ytest = encode_dataframe(encoder, data=test, mode="pytorch")
+xtest = nn.utils.rnn.pad_sequence(sequences=xtest, batch_first=True, padding_value=0.0)
 
 
 #%%
@@ -73,10 +66,6 @@ bucket.download_file(
 model.load_weights("../artefacts/model_synthdata.hdf5")
 
 #%%
-raw_preds = model.predict(synth_xtest.numpy())
-
-#%%
-preds = raw_preds.argmax(axis=1)
 
 #%%
 from sklearn.metrics import classification_report
@@ -92,6 +81,11 @@ lda_topic_real_topic_mapper = {
 }
 
 
+#%%
+# on synth data
+raw_preds = model.predict(synth_xtest.numpy())
+preds = raw_preds.argmax(axis=1)
+
 synth_model_df = (
     pd.DataFrame(
         classification_report(preds, synth_ytest.cat.codes.values, output_dict=True)
@@ -102,15 +96,39 @@ synth_model_df = (
 )
 synth_model_df
 
-
-#%%
 with open(
-    "../report/benchmark_outputs/synth_only_model_classificationreport.tex", "w"
+    "../report/benchmark_outputs/synth_only_model_classificationreport_synthdata.tex", "w"
 ) as f:
     synth_model_df.to_latex(
         buf=f,
         escape=False,
         index=True,
         bold_rows=True,
-        caption="Benchmark results of neural net on synthetic data",
+        caption="Benchmark results of neural net (trained on synthetic data only) on synthetic data",
+    )
+
+#%%
+# on real data
+raw_preds = model.predict(xtest.numpy())
+preds = raw_preds.argmax(axis=1)
+
+model_df = (
+    pd.DataFrame(classification_report(preds, ytest.cat.codes.values, output_dict=True))[
+        [str(x) for x in range(7)]
+    ]
+    .rename(lda_topic_real_topic_mapper, axis=1)
+    .round(3)
+    .T.assign(support=lambda d: d["support"].astype("int"))
+)
+model_df
+
+with open(
+    "../report/benchmark_outputs/synth_only_model_classificationreport_realdata.tex", "w"
+) as f:
+    model_df.to_latex(
+        buf=f,
+        escape=False,
+        index=True,
+        bold_rows=True,
+        caption="Benchmark results of neural net (trained on synthetic data only) on real data",
     )
