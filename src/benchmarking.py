@@ -12,7 +12,7 @@ from tensorflow import keras
 import os
 from sklearn.metrics import classification_report
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-
+from sklearn.metrics import accuracy_score
 
 #%%
 try:
@@ -76,7 +76,7 @@ lda_topic_real_topic_mapper_real = {
 NN_SYNTHONLY_BENCHMARKING = True
 NN_SYNTH_REAL_BENCHMARKING = True
 NN_REALONLY_BENCHMARKING = True
-LDA_BENCHMARKING = False
+LDA_BENCHMARKING = True
 
 #%%
 # --------------------------- Neural Network Benchmarking ---------------------------
@@ -107,6 +107,9 @@ if NN_SYNTHONLY_BENCHMARKING or NN_SYNTH_REAL_BENCHMARKING or NN_REALONLY_BENCHM
                 index=True,
                 bold_rows=False,
             )
+
+        with open(tex_output_path, "a") as f:
+            f.write("% Accuracy: " + str(accuracy_score(preds, ytest.cat.codes.values)))
 
 
 #%%
@@ -272,6 +275,9 @@ if LDA_BENCHMARKING:
                 index=True,
                 bold_rows=False,
             )
+
+        with open(tex_output_path, "a") as f:
+            f.write("% Accuracy: " + str(accuracy_score(preds_lda, ytest_lda)))
 
     # --------------------------- LDA model benchmarks ---------------------------
 
