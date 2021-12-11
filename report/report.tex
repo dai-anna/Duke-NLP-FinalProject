@@ -4,9 +4,9 @@
 \usepackage{booktabs}
 \usepackage{adjustbox}
 %\usepackage{emoji}
-%\usepackage{biblatex}
+\usepackage{biblatex}
 %\bibliographystyle{plain}
-%\bibliography{lib}
+\bibliography{lib}
 
 
 \title{\vspace{-1.5cm}IDS703 Final Project Report}
@@ -41,12 +41,22 @@ Finally, the LDA is used to generate synthetic data. For each topic, we sample 1
 
 
 \subsection{Discriminative Model}
+\subsubsection{Model Architecture}
 - network description
-- hyperparameter tuning on synth data
-- application to real
-- transfer learning on real data
+- Adam optimizer
+- Learning Rate found using the Learning Rate range test (= 10 ** -2.5) \cite{smith2018disciplined}
 
-- compare to model that has ONLY been trained on real?
+
+	
+	
+
+\subsubsection{Training Process}
+1) hyperparameter tuning on synth data
+2) benchmark on synth and real
+3) continue training on real data
+4) benchmark on synth and real
+5) Completely new model: Hyperparametertuning only on real data
+6) benchmark on synth and real
 
 % --------------------------------------------------------------------------------
 \section{Results}
@@ -99,11 +109,19 @@ Table 7: Benchmark results of LDA classification on synthetic data
 \end{center}
 Table 8: Benchmark results of LDA classification on real data
 
-% --------------------------------------------------------------------------------
-\section{Conclusion}
+
+\subsection{Learned Word Embeddings}
+To verify that the neural network model has learned meaningful word embeddings, we feed it 7 manually chosen words (one for each topic, but never the name of the topic itself) and find the ten closest word in the embedding space using cosine similarity. We find that the word embeddings capture an impressive amount of meaning: The name of Formula1 driver Lewis Hamilton is closest to other driver's names as well as "formula" and "race". "Barcelona" maps to other sports clubs that played in the championsleague. "Vaccine" is close to health- and covid-related words while "Christmas" is similar to "december" and "festive". For "Elon" and "BTC" the closest words are coherent and reffer to Tesla and Cryptocurrencies. Only "turkey" is not clearly close to thanksgiving, presumably as the topic "thanksgiving" has been hard to identify throughout the experiments.
+TODO:
+- Do the accuracies support this view?
+
+
 \begin{adjustbox}{width=\columnwidth,center}
 \input{embeddings_similar_words.tex}
 \end{adjustbox}
+
+% --------------------------------------------------------------------------------
+\section{Conclusion}
 
 
 
