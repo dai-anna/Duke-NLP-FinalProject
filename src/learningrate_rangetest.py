@@ -10,6 +10,7 @@ from tensorflow.keras.callbacks import LambdaCallback
 
 class LRFinder:
     """
+    Source: https://github.com/beringresearch/lrfinder
     Learning rate range test detailed in Cyclical Learning Rates for Training
     Neural Networks by Leslie N. Smith. The learning rate range test is a test
     that provides valuable information about the optimal learning rate. During
