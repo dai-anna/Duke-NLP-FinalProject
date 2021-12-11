@@ -70,7 +70,7 @@ def get_most_similar_words(n: int, word: str, similarity_matrix: np.ndarray):
     word_vec = embeddings[word_idx]
     similarities = similarity_matrix[word_idx]
     most_similar_idxs = similarities.argsort()[-n:][::-1]
-    most_similar_words = [encoder.decode([idx]) for idx in most_similar_idxs]
+    most_similar_words = [encoder.decode([idx]) for idx in most_similar_idxs[1:]] # skip word itself
     return most_similar_words
 
 
@@ -88,16 +88,12 @@ picked_words = [
 ]
 
 output_df = pd.DataFrame(
-    {word: ", ".join(get_most_similar_words(10, word, similarity_matrix)) for word in picked_words},
-    # columns=["word", "most_similar"],
+    {word: get_most_similar_words(10, word, similarity_matrix) for word in picked_words},
+    # index=picked_words,
+    # columns=["most similar"],
 )
 
+
 output_df
-#%%
-from sklearn.manifold import TSNE
+output_df.to_latex("../report/embeddings_similar_words.tex", index=False)
 
-tsne = TSNE(n_jobs=-1)
-tsne_embeddings = tsne.fit_transform(embeddings)
-
-#%%
-tsne_df = pd.DataFrame(tsne_embeddings, columns=["x", "y"])
