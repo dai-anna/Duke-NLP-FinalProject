@@ -60,7 +60,7 @@ In this project, we have trained three discriminative models that are compared a
 \end{itemize}
 
 
-We begin by tuning the models hyperparameters on the synthetic data set. We use a random search to find the ideal configuration in our hyperparameter search space which is defined in Table X. The tuning is implemented using the \texttt{optuna} library (\cite{optunapaper}), with 50 total trials due to time constraints. Each model is trained for 20 epochs, but we employ an early stopping mechanisms to stop training after 3 epochs without validation accuracy as empirically, our models converged quickly and performance plateaued. The batch size for our experiments is fixed at 64.
+We begin by tuning the models hyperparameters on the synthetic data set.The tuning is implemented using the \texttt{optuna} library (\cite{optunapaper}) and its implementation of Tree-structured Parzen Estimators, a sequential model-based optimization approach to intelligently exploring hyperparameter search spaces (\cite{bergstraTPE}). Each experiments is run for 50 trials (1 trial = one entire training run) due to time constraints. Each model is trained for 20 epochs, but we employ an early stopping mechanisms to stop training after 3 epochs without validation accuracy increase as empirically, our models converged quickly and performance plateaued. The batch size for our experiments is fixed at 64.
 
 \begin{center}
 \begin{tabular}{lll}
@@ -150,11 +150,7 @@ Table 5 \& 6: Benchmark results of neural net (trained on real data only)
 
 \subsection{A Look at the Learned Word Embeddings}
 To verify that the neural network model has learned meaningful word embeddings, we feed it seven manually chosen words (one closely related to each topic, but never the name of the topic itself) and find the ten closest word in the embedding space using cosine similarity. We find that the word embeddings capture an impressive amount of meaning: The name of Formula 1 driver Lewis Hamilton is closest to other drivers' names as well as ``formula" and ``race". ``Barcelona" maps to other sports clubs that plays in the Champions League. Similarly,  we observe that ``vaccine" is close to health- and covid-related words while ``Christmas" is similar to ``December" and ``festive". For ``Elon" and ``BTC" the closest words are coherent and refer to Tesla and Cryptocurrencies. Only ``turkey" is not clearly close to Thanksgiving, presumably as the topic \texttt{thanksgiving} has been hard to identify throughout the experiments. It is interesting to note that various relevant emojis have been identified as closely-related to each topic word, which confirms our initial hypothesis that emojis can be as meaningful as other words.
-
-TODO:
-- Rephrase the emojis bit?
-- Do the accuracies support this view?
-
+\\[5pt]
 
 \begin{adjustbox}{width=\columnwidth,center}
 \input{embeddings_similar_words.tex}
