@@ -80,7 +80,7 @@ In this project, we have trained three discriminative models that are compared a
 \end{center}
 
 \noindent After finding the optimal hyperparameter configuration (shown in Table XX), we refit the model using the optimal parameters and benchmark its performance on the synthetic and real data. Subsequently, we continue training the same model on the real data set. We hypothesize that pre-training on synthetic data might help the model converge faster on real-world data. After training for another 20 epochs, we benchmark the model again.
-
+\\[5pt]
 \noindent To gauge whether pre-training on synthetic data had an impact on model performance or training behavior, we conduct another experiment. We start a new hyperparameter search with the same model architecture and search space, but this time on the real data set. We use the optimal parameters to create a third neural network model that has never seen synthetic data and benchmark it on both, the synthetic and real test set. Table XX shows the optimal parameter configurations found in each run.
 
 
@@ -108,7 +108,9 @@ In this project, we have trained three discriminative models that are compared a
 \section{Results}
 \subsection{LDA Model}
 
-The LDA model performs exceptionally well scoring precision and recall values of around 0.98 on synthetic data. This is to be expected, as the model itself generated the data. Therefore, there is only a small amount of randomness from the sampling procedure that prevents the model from achieving an accuracy of 100\%. However, applying the same model to real-world data reveals that this performance does not translate well. The topics \texttt{thanksgiving} and \texttt{covid19} in particular seem to be hard to classify by the model as they have the lowest precision and recall values of all topics. The topic \texttt{formula1}, on the other hand, seems to be the easiest to classify, as around 55.8\% of the models \texttt{formula1} predictions are correct (precision) and the model is able to identify more than half of the \texttt{formula1} related tweets (recall = 0.562). This model achieves an accuracy of $\approx 98\%$ on synthetic and $\approx 34\%$ on real data.
+The LDA model performs exceptionally well scoring precision and recall values of around 0.98 on synthetic data. This is to be expected, as the model itself generated the data. Therefore, there is only a small amount of randomness from the sampling procedure that prevents the model from achieving an accuracy of 100\%. However, applying the same model to real-world data reveals that this performance does not translate well. The topics \texttt{thanksgiving} and \texttt{covid19} in particular seem to be hard to classify by the model as they have the lowest precision and recall values of all topics. The topic \texttt{formula1}, on the other hand, seems to be the easiest to classify, as around 55.8\% of the models \texttt{formula1} predictions are correct (precision) and the model is able to identify more than half of the \texttt{formula1} related tweets (recall = 0.562).
+This model achieves an accuracy of $\approx 98\%$ on synthetic and $\approx 34\%$ on real data.
+
 \begin{center}
 \input{./benchmark_outputs/lda_classificationreport_synthdata.tex}
 \qquad
@@ -129,14 +131,15 @@ The model achieves an accuracy of $\approx 95\%$ on synthetic and $\approx 35\%$
 \input{./benchmark_outputs/synth_only_model_classificationreport_realdata.tex}
 \end{center}
 \begin{center}
-Table 3 \& 4: Benchmark results of neural net (trained on synthetic data only) on synthetic data (left) and real data (right)
+Table 3 \& 4: Benchmark results of neural net (trained on synthetic data only) 
+
+on synthetic data (left) and real data (right)
 \end{center}
 
-
-
-
 \subsubsection{Training on Synthetic Data and Real Data}
-Next, we assess the predictive performance of a model that has been trained on the synthetic data set first, and then continues training on the real data set. While its performance on the synthetic data after finishing the training is worse than the models discussed before, it outperforms them on the real data set achieving consistently good performance across all topics. The model achieves an accuracy of $\approx 51\%$ on synthetic and $\approx 83\%$ on real data.
+Next, we assess the predictive performance of a model that has been trained on the synthetic data set first, and then continues training on the real data set. While its performance on the synthetic data after finishing the training is noticeably worse than the models discussed before, it outperforms them on the real data set achieving consistently good performance across all topics.
+The model achieves an accuracy of $\approx 51\%$ on synthetic and $\approx 83\%$ on real data.
+
 \begin{center}
 \input{./benchmark_outputs/synthandreal_model_classificationreport_synthdata.tex}
 \qquad
@@ -148,9 +151,10 @@ Table 3 \& 4: Benchmark results of neural net (trained on synthetic data
 and real data) on synthetic data (left) and real data (right)
 \end{center}
 
-
 \subsubsection{Training on Real Data Only}
+Lastly, we evaluate the performance of the neural network model that is trained only on real data. While this model reaches the lowest predictive performance overall compared to the previous models on synthetic data, it generally performs the best on real data, achieving a slightly higher precision and recall value than the continued training model for most topics. The high performance on predicting topics in the real data set is consistent across all topics.
 The model achieves an accuracy of $\approx 42\%$ on synthetic and $\approx 84\%$ on real data.
+
 \begin{center}
 \input{./benchmark_outputs/justreal_model_classificationreport_synthdata.tex}
 \qquad
@@ -164,7 +168,7 @@ Table 5 \& 6: Benchmark results of neural net (trained on real data only)
 
 
 \subsection{A Look at the Learned Word Embeddings}
-To verify that the neural network model has learned meaningful word embeddings, we feed it seven manually chosen words (one closely related to each topic, but never the name of the topic itself) and find the ten closest word in the embedding space using cosine similarity. We find that the word embeddings capture an impressive amount of meaning: The name of Formula 1 driver Lewis Hamilton is closest to other drivers' names as well as ``formula" and ``race". ``Barcelona" maps to other sports clubs that plays in the Champions League. Similarly,  we observe that ``vaccine" is close to health- and covid-related words while ``Christmas" is similar to ``December" and ``festive". For ``Elon" and ``BTC" the closest words are coherent and refer to Tesla and Cryptocurrencies. Only ``turkey" is not clearly close to Thanksgiving, presumably as the topic \texttt{thanksgiving} has been hard to identify throughout the experiments. It is interesting to note that various relevant emojis have been identified as closely-related to each topic word, which confirms our initial hypothesis that emojis can be as meaningful as other words.
+To verify that the neural network model has learned meaningful word embeddings, we feed it seven manually chosen words (one closely related to each topic, but never the name of the topic itself) and find the ten closest word in the embedding space using cosine similarity. We find that the word embeddings capture an impressive amount of meaning: The name of Formula 1 driver Lewis Hamilton is closest to other drivers' names as well as ``formula" and ``race". ``Barcelona" maps to other sports clubs that plays in the Champions League. Similarly,  we observe that ``vaccine" is close to health- and covid-related words while ``Christmas" is similar to ``December" and ``festive". For ``Elon" and ``BTC" the closest words are coherent and refer to Tesla and Cryptocurrencies. Only ``turkey" is not clearly close to Thanksgiving, presumably as the topic \texttt{thanksgiving} has been hard to identify throughout the experiments. It is interesting to note that various relevant emojis have been identified as closely-related to each topic word, which confirms our initial hypothesis that emojis can be as meaningful as word tokens.
 \\
 
 \begin{adjustbox}{width=\columnwidth,center}
@@ -178,9 +182,9 @@ To verify that the neural network model has learned meaningful word embeddings, 
 \section{Discussion}
 - NN synthonly \& LDA super similar (with same bad generalization)
 - Synthandreal \& realonly have similar real world performance
+- AD: maybe mention somewhere that because of the limitations with the LDA generation, (where synth data does not necessarily infer the same topics) our synthetic data is quite different, therefore for each model, performance on synth data seems to be inverted correlated with performance on real data?
 - F1 and holiday seem to be different between synth data and real data (good acc on real data but bad on synth data)
 
-\\[5pt]
 
 % Mention catastrophic forgetting:
 \noindent While performing better on real data, the network that is trained on synthetic data first and then continues learning on real data has an inferior performance on synthetic data compared to all other models that were trained on the synthetic data set. Apparently, continuing training on real data makes the model un-learn relationships in the artificial data set. This phenomenon is known as \emph{Catastrophic Forgetting} and is an ongoing area of research (e.g. \cite{kaushik2021understanding}). We have to add that for our example, the results indicate that the artificially generated data set and real data set seem to be slightly dissimilar. This can be partly explained by the LDA being a bag-of-words model and therefore not generation sequential data. Moreover, we manually had to label the inferred topics, which worked well for the majority of topics, but turned out to not perfectly recreate the topics \texttt{covid19} and \texttt{thanksgiving}.
