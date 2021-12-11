@@ -50,14 +50,14 @@ for x_ in (xtrain, xtest):
 
 #%%
 # ----------------------------------- Vectorize data and fit model -----------------------------------
-RETRAIN = True
+cv = CountVectorizer(vocabulary=encoder.token_to_index)
+
+xtrain_matrix = cv.transform(xtrain)
+xtest_matrix = cv.transform(xtest)
+
+RETRAIN = False
 
 if RETRAIN:
-    cv = CountVectorizer(vocabulary=encoder.token_to_index)
-    # cv = TfidfVectorizer(vocabulary=encoder.token_to_index)
-    xtrain_matrix = cv.transform(xtrain)
-    xtest_matrix = cv.transform(xtest)
-
     lda = LatentDirichletAllocation(n_components=7, random_state=42, n_jobs=-1)
     lda.fit(xtrain_matrix)
 
@@ -70,13 +70,14 @@ if RETRAIN:
         bucket.upload_file(
             "../artefacts/lda_vectorizer.joblib", "artefacts/lda_vectorizer.joblib"
         )
-        bucket.upload_file("../artefacts/lda_model.joblib", "artefacts/lda_model.joblib")
+        bucket.upload_file(
+            "../artefacts/lda_model.joblib", "artefacts/lda_model.joblib"
+        )
         print("[INFO] LDA model and vectorizer saved to S3.")
 
 else:
     cv = joblib.load("../artefacts/lda_vectorizer.joblib")
     lda = joblib.load("../artefacts/lda_model.joblib")
-
 
 #%%
 # ----------------------------------- Print top words per topic -----------------------------------
@@ -118,6 +119,8 @@ lda_topic_real_topic_mapper = {
 
 #%%
 # ----------------------------------- Generate Synthetic Data -----------------------------------
+GENERATE_DATA = False
+
 def generate_synthetic_data(n_samples_per_topic: int):
     tweet_length_distribution = train["tweet"].apply(lambda r: len(r.split())).values
 
@@ -136,35 +139,38 @@ def generate_synthetic_data(n_samples_per_topic: int):
 
     return synth_data
 
+if GENERATE_DATA:
+    synth_df = pd.DataFrame(
+        generate_synthetic_data(n_samples_per_topic=10_000),
+        columns=["tweet", "hashtag"],
+    )
+    synth_df["hashtag"] = synth_df["hashtag"].astype("category")
 
-synth_df = pd.DataFrame(
-    generate_synthetic_data(n_samples_per_topic=10_000), columns=["tweet", "hashtag"]
-)
-synth_df["hashtag"] = synth_df["hashtag"].astype("category")
+    # ----------------------------------- Save Synthetic Data -----------------------------------
+    synth_df.to_parquet("../data/synth_data.parquet")
 
-#%%
-# ----------------------------------- Save Synthetic Data -----------------------------------
-synth_df.to_parquet("../data/synth_data.parquet")
+    xtrain, xval, ytrain, yval = train_test_split(
+        synth_df["tweet"].to_frame(),
+        synth_df["hashtag"],
+        test_size=0.4,
+        random_state=42,
+    )
 
-xtrain, xval, ytrain, yval = train_test_split(
-    synth_df["tweet"].to_frame(), synth_df["hashtag"], test_size=0.4, random_state=42
-)
+    xval, xtest, yval, ytest = train_test_split(
+        xval, yval, test_size=0.5, random_state=42
+    )
 
-xval, xtest, yval, ytest = train_test_split(xval, yval, test_size=0.5, random_state=42)
+    for x_ in (xtrain, xval, xtest):
+        print(x_.shape)
 
-for x_ in (xtrain, xval, xtest):
-    print(x_.shape)
+    pd.concat([xtrain, ytrain], axis=1).to_parquet("../data/synth_train.parquet")
+    pd.concat([xval, yval], axis=1).to_parquet("../data/synth_val.parquet")
+    pd.concat([xtest, ytest], axis=1).to_parquet("../data/synth_test.parquet")
+    print("Saved synth parquets to disk.")
 
-
-#%%
-pd.concat([xtrain, ytrain], axis=1).to_parquet("../data/synth_train.parquet")
-pd.concat([xval, yval], axis=1).to_parquet("../data/synth_val.parquet")
-pd.concat([xtest, ytest], axis=1).to_parquet("../data/synth_test.parquet")
-print("Saved synth parquets to disk.")
-
-if SAVE_TO_S3:
-    bucket.upload_file("../data/synth_data.parquet", "data/synth_data.parquet")
-    bucket.upload_file("../data/synth_train.parquet", "data/synth_train.parquet")
-    bucket.upload_file("../data/synth_val.parquet", "data/synth_val.parquet")
-    bucket.upload_file("../data/synth_test.parquet", "data/synth_test.parquet")
-    print("[INFO] Synthetic data saved to S3.")
+    if SAVE_TO_S3:
+        bucket.upload_file("../data/synth_data.parquet", "data/synth_data.parquet")
+        bucket.upload_file("../data/synth_train.parquet", "data/synth_train.parquet")
+        bucket.upload_file("../data/synth_val.parquet", "data/synth_val.parquet")
+        bucket.upload_file("../data/synth_test.parquet", "data/synth_test.parquet")
+        print("[INFO] Synthetic data saved to S3.")

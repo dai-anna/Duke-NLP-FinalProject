@@ -30,12 +30,13 @@ except:
 
 #%%
 # Load data from disk
+USE_SYNTHETIC_DATA = False
+
 encoder = joblib.load("../artefacts/encoder.pickle")
 
-# TODO: train on synth_data first
-train = pd.read_parquet("../data/synth_train.parquet")
-val = pd.read_parquet("../data/synth_val.parquet")
-test = pd.read_parquet("../data/synth_test.parquet")
+train = pd.read_parquet(f"../data/{'synth_' if USE_SYNTHETIC_DATA else ''}train.parquet")
+val = pd.read_parquet(f"../data/{'synth_' if USE_SYNTHETIC_DATA else ''}val.parquet")
+test = pd.read_parquet(f"../data/{'synth_' if USE_SYNTHETIC_DATA else ''}test.parquet")
 
 xtrain, ytrain = encode_dataframe(encoder, data=train, mode="pytorch")
 xval, yval = encode_dataframe(encoder, data=val, mode="pytorch")
@@ -158,14 +159,14 @@ if __name__ == "__main__":
     CREATE_NEW_STUDY = True
     if CREATE_NEW_STUDY:
         study = optuna.create_study(
-            "sqlite:///../artefacts/tf_hyperparameter_study.db",
+            f"sqlite:///../artefacts/tf_hyperparameter_study_{'synth' if USE_SYNTHETIC_DATA else 'real'}.db",
             direction="maximize",
             study_name="tf_study001",
         )
     else:
         study = optuna.load_study(
             "tf_study001",
-            storage="sqlite:///../artefacts/tf_hyperparameter_study.db",
+            storage=f"sqlite:///../artefacts/tf_hyperparameter_study_{'synth' if USE_SYNTHETIC_DATA else 'real'}.db",
         )
 
     study.optimize(objective, n_trials=50)  # start study
@@ -175,6 +176,7 @@ if __name__ == "__main__":
     # save study to s3
     if SAVE_TO_S3:
         bucket.upload_file(
-            "../artefacts/tf_hyperparameter_study.db", "artefacts/tf_hyperparameter_study.db"
+            f"../artefacts/tf_hyperparameter_study_{'synth' if USE_SYNTHETIC_DATA else 'real'}.db",
+            f"artefacts/tf_hyperparameter_study_{'synth' if USE_SYNTHETIC_DATA else 'real'}.db",
         )
     print("[INFO] Study saved to S3")
