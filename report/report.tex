@@ -55,7 +55,7 @@ We implemented a discriminative model as a neural network model to be able to cl
 \subsubsection{Model Architecture}
 \fbox{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{architecture.drawio.png}}
 
-The model contains three essential subparts: the embedding, the bidrectional GRU, and the final densely connected layer. Each layer had one or more hyperparameter that were subject to tuning. These hyperparameters are denoted by $HP(#)$. The model is fed the document in the form of tokens identified from the encoder. There were "X" number of unique tokens. The embedding layer is a neural net that converts each token into a vector of length $HP(0)$. These embedded vectors are then received as input by the two GRU layers. GRU are a form of recurrent neural networks that use gates to better pass long term memory but have smaller complexity than LSTM. GRU also do not differentiate between output vector and hidden vector. The size of these hidden vectors was $HP(1)$. They are faster and easier to train than LSTMs while being more expressive than simple RNNs. The final hidden vectors of both GRU (forward and backward) are then concatenated and fed into a dropout layer with dropout rate $HP(2)$ followed by a densely connected network of two layers seperated by another dropout layer with rate $HP(2)$., These dense layers were of size $HP(3)$ and 7, and had activation layers of ReLU and Softmax respectively.
+The model contains three essential subparts: the embedding, the bidrectional GRU, and the final densely connected layer. Each layer had one or more hyperparameter that were subject to tuning. These hyperparameters are denoted by $HP(i)$. The model is fed the document in the form of tokens identified from the encoder. There were "X" number of unique tokens. The embedding layer is a neural net that converts each token into a vector of length $HP(0)$. These embedded vectors are then received as input by the two GRU layers. GRU are a form of recurrent neural networks that use gates to better pass long term memory but have smaller complexity than LSTM. GRU also do not differentiate between output vector and hidden vector. The size of these hidden vectors was $HP(1)$. They are faster and easier to train than LSTMs while being more expressive than simple RNNs. The final hidden vectors of both GRU (forward and backward) are then concatenated and fed into a dropout layer with dropout rate $HP(2)$ followed by a densely connected network of two layers seperated by another dropout layer with rate $HP(2)$., These dense layers were of size $HP(3)$ and 7, and had activation layers of ReLU and Softmax respectively.
 - Adam optimizer
 - Learning Rate found using the Learning Rate range test (= 10 ** -2.5)(\cite{smith2018disciplined})
 
@@ -67,9 +67,21 @@ The model contains three essential subparts: the embedding, the bidrectional GRU
 5) Completely new model: Hyperparametertuning only on real data
 6) benchmark on synth and real
 
+
 % --------------------------------------------------------------------------------
 \section{Results}
-\subsection{Benchmarking on Synthetic Data}
+\subsection{LDA Model}
+\begin{center}
+\input{./benchmark_outputs/lda_classificationreport_synthdata.tex}
+\qquad
+\input{./benchmark_outputs/lda_classificationreport_realdata.tex}
+\end{center}
+\begin{center}
+Table 1 \& 2: Benchmark results of LDA model on synthetic data (left) and real data (right)
+\end{center}
+
+\subsection{Neural Network}
+\subsubsection{Training on Synthetic Data Only}
 
 \begin{center}
 \input{./benchmark_outputs/synth_only_model_classificationreport_synthdata.tex}	
@@ -77,16 +89,13 @@ The model contains three essential subparts: the embedding, the bidrectional GRU
 \input{./benchmark_outputs/synth_only_model_classificationreport_realdata.tex}
 \end{center}
 \begin{center}
-Table 1 \& 2: Benchmark results of neural net (trained on synthetic data only) 
-
-on synthetic data (left) and real data (right)
-
+Table 3 \& 4: Benchmark results of neural net (trained on synthetic data only) on synthetic data (left) and real data (right)
 \end{center}
 
 
-\subsection{Benchmarking on Real Data}
 
 
+\subsubsection{Training on Synthetic Data and Real Data}
 \begin{center}
 \input{./benchmark_outputs/synthandreal_model_classificationreport_synthdata.tex}
 \qquad
@@ -98,6 +107,8 @@ Table 3 \& 4: Benchmark results of neural net (trained on synthetic data
 and real data) on synthetic data (left) and real data (right)
 \end{center}
 
+
+\subsubsection{Training on Real Data Only}
 \begin{center}
 \input{./benchmark_outputs/justreal_model_classificationreport_synthdata.tex}
 \qquad
@@ -109,16 +120,6 @@ Table 5 \& 6: Benchmark results of neural net (trained on real data only)
  on synthetic data (left) and real data (right)
 \end{center}
 
-\begin{center}
-\input{./benchmark_outputs/lda_classificationreport_synthdata.tex}
-\qquad
-\input{./benchmark_outputs/lda_classificationreport_realdata.tex}
-\end{center}
-\begin{center}
-Table 7 \& 8: Benchmark results of LDA model on synthetic data (left) and real data (right)
-
-
-\end{center}
 
 \subsection{Learned Word Embeddings}
 To verify that the neural network model has learned meaningful word embeddings, we feed it 7 manually chosen words (one for each topic, but never the name of the topic itself) and find the ten closest word in the embedding space using cosine similarity. We find that the word embeddings capture an impressive amount of meaning: The name of Formula1 driver Lewis Hamilton is closest to other driver's names as well as "formula" and "race". "Barcelona" maps to other sports clubs that played in the championsleague. "Vaccine" is close to health- and covid-related words while "Christmas" is similar to texttt{december} and "festive". For "Elon" and "BTC" the closest words are coherent and reffer to Tesla and Cryptocurrencies. Only "turkey" is not clearly close to thanksgiving, presumably as the topic "thanksgiving" has been hard to identify throughout the experiments.
