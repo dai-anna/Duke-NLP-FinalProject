@@ -72,7 +72,7 @@ The model contains three essential subparts: the embedding, the bidrectional GRU
 \section{Results}
 \subsection{LDA Model}
 
-The LDA model performs exceptionally well scoring precision and recall values of around 0.98 on synthetic data. This is to be expected, as the model itself generated the data. Therefore, there is only a small amount of randomness from the sampling procedure that prevents the model from achieving an accuracy of 100\%. However, applying the same model to real-world data reveals that this performance does not translate well. The topics \texttt{thanksgiving} and \texttt{covid19} in particular seem to be hard to classify by the model as they have the lowest precision and recall values of all topics. The topic \texttt{Formula1} seems to be the easiest to classify, as around 55.8\% of the models \texttt{Formula1} predictions are correct (precision) and the model is able to identify more than half of the \texttt{Formula1} related tweets (recall = 0.562). The model achieves an accuracy of $\approx X \%$ on synthetic and $\approx X\%$ on real data.
+The LDA model performs exceptionally well scoring precision and recall values of around 0.98 on synthetic data. This is to be expected, as the model itself generated the data. Therefore, there is only a small amount of randomness from the sampling procedure that prevents the model from achieving an accuracy of 100\%. However, applying the same model to real-world data reveals that this performance does not translate well. The topics \texttt{thanksgiving} and \texttt{covid19} in particular seem to be hard to classify by the model as they have the lowest precision and recall values of all topics. The topic \texttt{Formula1} seems to be the easiest to classify, as around 55.8\% of the models \texttt{Formula1} predictions are correct (precision) and the model is able to identify more than half of the \texttt{Formula1} related tweets (recall = 0.562). The model achieves an accuracy of $\approx 98\%$ on synthetic and $\approx 34\%$ on real data.
 \begin{center}
 \input{./benchmark_outputs/lda_classificationreport_synthdata.tex}
 \qquad
@@ -84,7 +84,8 @@ Table 1 \& 2: Benchmark results of LDA model on synthetic data (left) and real d
 
 \subsection{Neural Networks}
 \subsubsection{Training on Synthetic Data Only}
-The neural network trained on synthetic data is almost able to achieve the same performance characteristics as the LDA model, although it performs slightly worse for almost every topic. The network
+The neural network trained on synthetic data is almost able to achieve the same performance characteristics as the LDA model, although it performs slightly worse for almost every topic. The generalisation to real data performs slightly better than the LDA, although it is noticeable that \texttt{Formula1} and \texttt{holidays} seem to be the hardest topics to classify.
+The model achieves an accuracy of $\approx 95\%$ on synthetic and $\approx 35\%$ on real data.
 
 \begin{center}
 \input{./benchmark_outputs/synth_only_model_classificationreport_synthdata.tex}	
@@ -99,6 +100,8 @@ Table 3 \& 4: Benchmark results of neural net (trained on synthetic data only) o
 
 
 \subsubsection{Training on Synthetic Data and Real Data}
+
+The model achieves an accuracy of $\approx XX\%$ on synthetic and $\approx XX\%$ on real data.
 \begin{center}
 \input{./benchmark_outputs/synthandreal_model_classificationreport_synthdata.tex}
 \qquad
@@ -112,6 +115,7 @@ and real data) on synthetic data (left) and real data (right)
 
 
 \subsubsection{Training on Real Data Only}
+The model achieves an accuracy of $\approx XX\%$ on synthetic and $\approx XX\%$ on real data.
 \begin{center}
 \input{./benchmark_outputs/justreal_model_classificationreport_synthdata.tex}
 \qquad
