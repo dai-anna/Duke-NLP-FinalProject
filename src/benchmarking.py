@@ -215,7 +215,7 @@ if NN_REALONLY_BENCHMARKING:
         synth_xtest,
         synth_ytest,
         "../report/benchmark_outputs/justreal_model_classificationreport_synthdata.tex",
-        "Benchmark results of neural net (trained on real data) on synthetic data",
+        "Benchmark results of neural net (trained only on real data) on synthetic data",
     )
 
     do_benchmark_and_save(
@@ -223,7 +223,7 @@ if NN_REALONLY_BENCHMARKING:
         xtest,
         ytest,
         "../report/benchmark_outputs/justreal_model_classificationreport_realdata.tex",
-        "Benchmark results of neural net (trained on real data) on real data",
+        "Benchmark results of neural net (trained only on real data) on real data",
     )
 
 #%%
