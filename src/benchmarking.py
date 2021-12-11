@@ -73,9 +73,9 @@ lda_topic_real_topic_mapper_real = {
 
 #%%
 # --------------------------- Benchmarking Switches ---------------------------
-NN_SYNTHONLY_BENCHMARKING = True
-NN_SYNTH_REAL_BENCHMARKING = True
-NN_REALONLY_BENCHMARKING = True
+NN_SYNTHONLY_BENCHMARKING = False
+NN_SYNTH_REAL_BENCHMARKING = False
+NN_REALONLY_BENCHMARKING = False
 LDA_BENCHMARKING = True
 
 #%%
@@ -246,6 +246,7 @@ if LDA_BENCHMARKING:
             .round(3)
             .T.rename(index={"covid": "covid19"})
             .assign(support=lambda d: d["support"].astype("int"))
+            .drop(columns=["f1-score","support"])
             .reindex(
                 [
                     "thanksgiving",
