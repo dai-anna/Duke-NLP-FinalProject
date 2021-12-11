@@ -1,5 +1,6 @@
 \documentclass[11pt]{article}
 \usepackage{booktabs}
+\usepackage{adjustbox}
 %\usepackage{biblatex}
 %\bibliographystyle{plain}
 %\bibliography{lib}
@@ -47,6 +48,7 @@ We used a Latent Dirichlet allocation (LDA) model as a generative model to learn
 \subsection{Benchmarking on Synthetic Data}
 
 \begin{center}
+\input{./benchmark_outputs/synth_only_model_classificationreport_synthdata.tex}	
 %\input{./benchmark_outputs/synth_only_model_classificationreport.tex}	
 \end{center}
 
@@ -54,6 +56,10 @@ We used a Latent Dirichlet allocation (LDA) model as a generative model to learn
 \subsection{Benchmarking on Real Data}
 
 \section{Conclusion}
+\begin{adjustbox}{width=\columnwidth,center}
+\input{embeddings_similar_words.tex}
+\end{adjustbox}
+
 
 
 
