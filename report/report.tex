@@ -4,9 +4,11 @@
 \usepackage{booktabs}
 \usepackage{adjustbox}
 %\usepackage{emoji}
-\usepackage{biblatex}
-%\bibliographystyle{plain}
+\usepackage[backend=bibtex8,style=authoryear]{biblatex}
+
 \bibliography{lib}
+%\bibliographystyle{plain}
+
 
 
 \title{\vspace{-1.5cm}IDS703 Final Project Report}
@@ -31,11 +33,11 @@ These topics were intentionally selected to have topics that have some amount of
 % --------------------------------------------------------------------------------
 \section{Methodology}
 \subsection{Workflow}
-The collected corpus of almost 70,000 tweets is randomly split into a training, validation, and test set in a 60/20/20 ratio. We will train models on the train set, find optimal hyperparameters using the validation set, and report all performance metrics in the \emph{Results} section on the test set, which is not used for any other purpose than evaluating each model once.
+The collected corpus of almost 70,000 tweets is randomly split into a training, validation, and test set in a 60/20/20 ratio. We will train models on the train set, find optimal hyperparameters using the validation set, and report all performance metrics in the \emph{Results} section on the test set, which is not used for any other purpose than evaluating each model once. 
 
 
 \subsection{Generative Model}
-We use a Latent Dirichlet Allocation (LDA) model as a generative model to learn from the corpus we have collected. This type of model does not require any hyperparamter tuning, and thus is trained using a combination of the training and validation dataset. We used the LDA implementation from scikit-learn \cite{sklearn}. It is fit to the corpus to find seven separate topics, as this is the number of actual topics in the training set. Subsequently, for each inferred topic, we manually inspect the top 50 words that are associated with it to assign it a name. This manual step is necessary, as the order of topics is not preserved. In fact, the LDA model does not even guarantee to find the same topics that were collected in the original data set. This shortcoming will be discussed in the \emph{Results} and \emph{Conclusion} sections. 
+We use a Latent Dirichlet Allocation (LDA) model as a generative model to learn from the corpus we have collected. This type of model does not require any hyperparamter tuning, and thus is trained using a combination of the training and validation dataset. We used the LDA implementation from scikit-learn (\cite{sklearn}). It is fit to the corpus to find seven separate topics, as this is the number of actual topics in the training set. Subsequently, for each inferred topic, we manually inspect the top 50 words that are associated with it to assign it a name. This manual step is necessary, as the order of topics is not preserved. In fact, the LDA model does not even guarantee to find the same topics that were collected in the original data set. This shortcoming will be discussed in the \emph{Results} and \emph{Conclusion} sections. 
 To use the LDA for document classification,  we let it infer the topic distribution of each document in the test set and use the $argmax(\cdot)$ function to assign each document the topic that is most prevalent according to the LDA.
 Finally, the LDA is used to generate synthetic data. For each topic, we sample 10,000 artificial documents, the length of which is sampled from the empirical distribution of tweet lengths each time. Similar to the actual data set, the synthetic data set is also split into a train, validation, and test set.
 
@@ -44,11 +46,11 @@ Finally, the LDA is used to generate synthetic data. For each topic, we sample 1
 \subsubsection{Model Architecture}
 - network description
 - Adam optimizer
-- Learning Rate found using the Learning Rate range test (= 10 ** -2.5) \cite{smith2018disciplined}
+- Learning Rate found using the Learning Rate range test (= 10 ** -2.5)(\cite{smith2018disciplined})
 
 
 	
-	
+ 	
 
 \subsubsection{Training Process}
 1) hyperparameter tuning on synth data
@@ -125,5 +127,8 @@ TODO:
 
 
 
+% --------------------------------------------------------------------------------
+\newpage
+\printbibliography
 
 \end{document}
