@@ -49,7 +49,7 @@ We implemented a discriminative model as a neural network model to be able to cl
 
 
 \subsubsection{Model Architecture}
-\fbox{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{architecture.drawio.png}}
+\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{architecture.drawio.png}
 
 The model contains three essential subparts: the embedding, the bidrectional GRU, and the final densely connected layer. Each layer had one or more hyperparameter that were subject to tuning. These hyperparameters are denoted by $HP(i)$. The model is fed the document in the form of tokens identified from the encoder. There were "X" number of unique tokens. The embedding layer is a neural net that converts each token into a vector of length $HP(0)$. These embedded vectors are then received as input by the two GRU layers. GRU are a form of recurrent neural networks that use gates to better pass long term memory but have smaller complexity than LSTM. GRU also do not differentiate between output vector and hidden vector. The size of these hidden vectors was $HP(1)$. They are faster and easier to train than LSTMs while being more expressive than simple RNNs. The final hidden vectors of both GRU (forward and backward) are then concatenated and fed into a dropout layer with dropout rate $HP(2)$ followed by a densely connected network of two layers seperated by another dropout layer with rate $HP(2)$., These dense layers were of size $HP(3)$ and 7, and had activation layers of ReLU and Softmax respectively.
 - Adam optimizer
