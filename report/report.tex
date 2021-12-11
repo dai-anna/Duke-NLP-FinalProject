@@ -1,5 +1,6 @@
 \documentclass[11pt]{article}
 \usepackage{booktabs}
+\usepackage{adjustbox}
 
 \title{IDS703 Final Project Report}
 \author{Anna Dai, Satvik Kishore, Moritz Wilksch}
@@ -28,12 +29,16 @@
 \subsection{Benchmarking on Synthetic Data}
 
 \begin{center}
-\input{./benchmark_outputs/synth_only_model_classificationreport.tex}	
+\input{./benchmark_outputs/synth_only_model_classificationreport_synthdata.tex}	
 \end{center}
 
 
 \subsection{Benchmarking on Real Data}
 
 \section{Conclusion}
+\begin{adjustbox}{width=\columnwidth,center}
+\input{embeddings_similar_words.tex}
+\end{adjustbox}
+
 
 \end{document}
