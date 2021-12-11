@@ -60,18 +60,18 @@ In this project, we have trained three discriminative models that are compared a
 \end{itemize}
 
 
-We begin by tuning the models hyperparameters on the synthetic data set.The tuning is implemented using the \texttt{optuna} library (\cite{optunapaper}) and its implementation of Tree-structured Parzen Estimators, a sequential model-based optimization approach to intelligently exploring hyperparameter search spaces (\cite{bergstraTPE}). Each experiments is run for 50 trials (1 trial = one entire training run) due to time constraints. Each model is trained for 20 epochs, but we employ an early stopping mechanisms to stop training after 3 epochs without validation accuracy increase as empirically, our models converged quickly and performance plateaued. The batch size for our experiments is fixed at 64.
+We begin by tuning the models hyperparameters on the synthetic data set.The tuning is implemented using the optuna library (\cite{optunapaper}) and its implementation of Tree-structured Parzen Estimators, a sequential model-based optimization approach to intelligently exploring hyperparameter search spaces (\cite{bergstraTPE}). Each experiments is run for 50 trials (1 trial = one entire training run) due to time constraints. Each model is trained for 20 epochs, but we employ an early stopping mechanisms to stop training after 3 epochs without validation accuracy increase as empirically, our models converged quickly and performance plateaued. The batch size for our experiments is fixed at 64.
 
 \begin{center}
-\begin{tabular}{lll}
+\begin{tabular}{llc}
 \toprule
     Parameter & Description & Search Space \\
 \midrule
-    HP(0) & Embedding dim & $2^{h_0}, h_0 \in \{4, 5, 6\}$\\
-    HP(1) & GRU dim & $2^{h_1}, h_1 \in \{4, 5, 6, 7, 8\}$\\
-    HP(2) & Dropout rate & $2^{h_2}, h_2 \in \{4, 5, 6, 7, 8\}$\\
-    HP(3) & Dense dim & $h_3 \in [0, 0.5]$ \\
-    HP(4) & $\ell_2$ regularization & $h_4 \in [10\mathrm{e}^{-9}, 0.5]$ \\
+    HP(0) & Embedding dim & $\{16k \vert k\in \{1, 2, 3, 4, 5\}\}$\\
+    HP(1) & GRU dim & $\{16k \vert k \in \{2, 3, ..., 16\}\}$\\
+    HP(2) & Dropout rate & $[0, 0.5]$\\
+    HP(3) & Dense dim &  $\{16k \vert k \in \{1, 2, ..., 16\}\}$\\
+    HP(4) & $\ell_2$ regularization & $[10\mathrm{e}^{-9}, 0.5]$ \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -81,10 +81,25 @@ We begin by tuning the models hyperparameters on the synthetic data set.The tuni
 
 After finding the optimal hyperparameter configuration (shown in Table XX), we refit the model using the optimal parameters and benchmark its performance on the synthetic and real data. Subsequently, we continue training the same model on the real data set. We hypothesise that pre-training on synthetic data might help the model converge faster on real-world data. After training for another 20 epochs, we benchmark the model again.
 
-To gauge whether pre-training on synthetic data had an impact on model performance or training behavior, we conduct another experiment. We start a new hyperparameter search with the same model architecture and search space, but this time on the real data set. We use the optimal parameters to create a third neural network model that has never seen synthetic data and benchmark it on both, the synthetic and real test set.
+To gauge whether pre-training on synthetic data had an impact on model performance or training behavior, we conduct another experiment. We start a new hyperparameter search with the same model architecture and search space, but this time on the real data set. We use the optimal parameters to create a third neural network model that has never seen synthetic data and benchmark it on both, the synthetic and real test set. Table XX shows the optimal parameter configurations found in each run.
 
 
-
+\begin{center}
+\begin{tabular}{llcc}
+\toprule
+    Parameter & Description & Synthetic Data & Real Data \\
+\midrule
+    HP(0) & Embedding dim & 32 & 64\\
+    HP(1) & GRU dim & 64 & 48\\
+    HP(2) & Dropout rate & 0.1 & 0.25\\
+    HP(3) & Dense dim & 64 & 112\\
+    HP(4) & $\ell_2$ regularization & $10\mathrm{e}^{-9}$ & $2\mathrm{e}{-8}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{center}
+	Table XX: Optimal hyperparameter configuration for models on synthetic and real data
+\end{center}
 
 
 
