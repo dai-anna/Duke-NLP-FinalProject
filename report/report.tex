@@ -5,9 +5,9 @@
 \usepackage{booktabs}
 \usepackage{adjustbox}
 %\usepackage{emoji}
-%\usepackage{biblatex}
+\usepackage{biblatex}
 %\bibliographystyle{plain}
-%\bibliography{lib}
+\bibliography{lib}
 
 
 \title{\vspace{-1.5cm}IDS703 Final Project Report}
@@ -17,10 +17,12 @@
 \begin{document}
 \maketitle
 
+% --------------------------------------------------------------------------------
 \section{Introduction}
 
 In this project, we work on tweet classification as a Natural Language Processing problem, more specifically, as a document classification problem. Twitter is a microblogging service where users post publicly visible "Tweets", which are essentially texts with less than 280 characters. These Tweets may also contain other media objects which are discarded for the purposes of this project. These Tweets most often serve as discussion pieces as part of larger conversations. They are relevant to any number of topics under discussion. These "topics" are also often explicitly highlighted by the user using a "hashtag", i.e. text with '\#' followed by the topic name, or a commonly used shorthand for it. For the purpose of our project, we treat these hashtags as "topics" for our document classification model, where each tweet is an instance of a document.
 
+% --------------------------------------------------------------------------------
 \section{Data}
 
 \subsection{Collection}
@@ -37,20 +39,38 @@ As the raw scraped Tweets are messy, we spend some time to pre-process the data 
 
 
 
+
+% --------------------------------------------------------------------------------
 \section{Methodology}
+\subsection{Workflow}
+The collected corpus of almost 70,000 tweets is randomly split into a training, validation, and test set in a 60/20/20 ratio. We will train models on the train set, find optimal hyperparameters using the validation set, and report all performance metrics in the \emph{Results} section on the test set, which is not used for any other purpose than evaluating each model once.
+
 
 \subsection{Generative Model}
-We used a Latent Dirichlet allocation (LDA) model as a generative model to learn from the corpus we have collected. This type of model does not require any hyperparamter tuning, and thus was trained using a combination of the training and validation dataset. We used the LDA implementation from scikit-learn \cite{sklearn}. 
+We use a Latent Dirichlet Allocation (LDA) model as a generative model to learn from the corpus we have collected. This type of model does not require any hyperparamter tuning, and thus is trained using a combination of the training and validation dataset. We used the LDA implementation from scikit-learn \cite{sklearn}. It is fit to the corpus to find seven separate topics, as this is the number of actual topics in the training set. Subsequently, for each inferred topic, we manually inspect the top 50 words that are associated with it to assign it a name. This manual step is necessary, as the order of topics is not preserved. In fact, the LDA model does not even guarantee to find the same topics that were collected in the original data set. This shortcoming will be discussed in the \emph{Results} and \emph{Conclusion} sections. 
+To use the LDA for document classification,  we let it infer the topic distribution of each document in the test set and use the $argmax(\cdot)$ function to assign each document the topic that is most prevalent according to the LDA.
+Finally, the LDA is used to generate synthetic data. For each topic, we sample 10,000 artificial documents, the length of which is sampled from the empirical distribution of tweet lengths each time. Similar to the actual data set, the synthetic data set is also split into a train, validation, and test set.
 
 
 \subsection{Discriminative Model}
+\subsubsection{Model Architecture}
 - network description
-- hyperparameter tuning on synth data
-- application to real
-- transfer learning on real data
+- Adam optimizer
+- Learning Rate found using the Learning Rate range test (= 10 ** -2.5) \cite{smith2018disciplined}
 
-- compare to model that has ONLY been trained on real?
 
+	
+	
+
+\subsubsection{Training Process}
+1) hyperparameter tuning on synth data
+2) benchmark on synth and real
+3) continue training on real data
+4) benchmark on synth and real
+5) Completely new model: Hyperparametertuning only on real data
+6) benchmark on synth and real
+
+% --------------------------------------------------------------------------------
 \section{Results}
 \subsection{Benchmarking on Synthetic Data}
 
@@ -116,10 +136,18 @@ Table 8: Benchmark results of LDA classification on real data
 \end{center}
 
 
-\section{Conclusion}
+\subsection{Learned Word Embeddings}
+To verify that the neural network model has learned meaningful word embeddings, we feed it 7 manually chosen words (one for each topic, but never the name of the topic itself) and find the ten closest word in the embedding space using cosine similarity. We find that the word embeddings capture an impressive amount of meaning: The name of Formula1 driver Lewis Hamilton is closest to other driver's names as well as "formula" and "race". "Barcelona" maps to other sports clubs that played in the championsleague. "Vaccine" is close to health- and covid-related words while "Christmas" is similar to "december" and "festive". For "Elon" and "BTC" the closest words are coherent and reffer to Tesla and Cryptocurrencies. Only "turkey" is not clearly close to thanksgiving, presumably as the topic "thanksgiving" has been hard to identify throughout the experiments.
+TODO:
+- Do the accuracies support this view?
+
+
 \begin{adjustbox}{width=\columnwidth,center}
 \input{embeddings_similar_words.tex}
 \end{adjustbox}
+
+% --------------------------------------------------------------------------------
+\section{Conclusion}
 
 
 
