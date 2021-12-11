@@ -73,10 +73,10 @@ lda_topic_real_topic_mapper_real = {
 
 #%%
 # --------------------------- Benchmarking Switches ---------------------------
-NN_SYNTHONLY_BENCHMARKING = False
-NN_SYNTH_REAL_BENCHMARKING = False
-NN_REALONLY_BENCHMARKING = False
-LDA_BENCHMARKING = True
+NN_SYNTHONLY_BENCHMARKING = True
+NN_SYNTH_REAL_BENCHMARKING = True
+NN_REALONLY_BENCHMARKING = True
+LDA_BENCHMARKING = False
 
 #%%
 # --------------------------- Neural Network Benchmarking ---------------------------
@@ -96,6 +96,7 @@ if NN_SYNTHONLY_BENCHMARKING or NN_SYNTH_REAL_BENCHMARKING or NN_REALONLY_BENCHM
             .rename(lda_topic_real_topic_mapper_real, axis=1)
             .round(3)
             .T.assign(support=lambda d: d["support"].astype("int"))
+            .drop(columns=["f1-score","support"])
         )
 
         # save

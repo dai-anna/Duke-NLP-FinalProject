@@ -5,7 +5,6 @@
 \usepackage{booktabs}
 \usepackage{adjustbox}
 %\usepackage{emoji}
-
 \usepackage[backend=bibtex8,style=authoryear]{biblatex}
 \bibliography{lib}
 
@@ -77,20 +76,14 @@ Finally, the LDA is used to generate synthetic data. For each topic, we sample 1
 \input{./benchmark_outputs/synth_only_model_classificationreport_realdata.tex}
 \end{center}
 \begin{center}
-Table 1: Benchmark results of neural net (trained on synthetic data only) on synthetic data
+Table 1 \& 2: Benchmark results of neural net (trained on synthetic data only) 
 
-Table 2: Benchmark results of neural net (trained on synthetic data only) on real data
+on synthetic data (left) and real data (right)
+
 \end{center}
 
 
 \subsection{Benchmarking on Real Data}
-
-\begin{center}
-\input{./benchmark_outputs/synthandreal_model_classificationreport_synthdata.tex}
-\end{center}
-\begin{center}
-Table 3: Benchmark results of neural net (trained on synthetic data and real data) on synthetic data
-\end{center}
 
 
 \begin{center}
@@ -99,9 +92,9 @@ Table 3: Benchmark results of neural net (trained on synthetic data and real dat
 \input{./benchmark_outputs/synthandreal_model_classificationreport_realdata.tex}
 \end{center}
 \begin{center}
-Table 3: Benchmark results of neural net (trained on synthetic data and real data) on synthetic data
+Table 3 \& 4: Benchmark results of neural net (trained on synthetic data 
 
-Table 4: Benchmark results of neural net (trained on synthetic data and real data) on real data
+and real data) on synthetic data (left) and real data (right)
 \end{center}
 
 \begin{center}
@@ -110,9 +103,9 @@ Table 4: Benchmark results of neural net (trained on synthetic data and real dat
 \input{./benchmark_outputs/justreal_model_classificationreport_realdata.tex}
 \end{center}
 \begin{center}
-Table 5: Benchmark results of neural net (trained on real data only) on synthetic data
+Table 5 \& 6: Benchmark results of neural net (trained on real data only)
 
-Table 6: Benchmark results of neural net (trained on real data only) on real data
+ on synthetic data (left) and real data (right)
 \end{center}
 
 \begin{center}
@@ -121,14 +114,13 @@ Table 6: Benchmark results of neural net (trained on real data only) on real dat
 \input{./benchmark_outputs/lda_classificationreport_realdata.tex}
 \end{center}
 \begin{center}
-Table 7: Benchmark results of LDA classification on synthetic data
+Table 7 \& 8: Benchmark results of LDA model on synthetic data (left) and real data (right)
 
-Table 8: Benchmark results of LDA classification on real data
 
 \end{center}
 
 \subsection{Learned Word Embeddings}
-To verify that the neural network model has learned meaningful word embeddings, we feed it 7 manually chosen words (one for each topic, but never the name of the topic itself) and find the ten closest word in the embedding space using cosine similarity. We find that the word embeddings capture an impressive amount of meaning: The name of Formula1 driver Lewis Hamilton is closest to other driver's names as well as "formula" and "race". "Barcelona" maps to other sports clubs that played in the championsleague. "Vaccine" is close to health- and covid-related words while "Christmas" is similar to "december" and "festive". For "Elon" and "BTC" the closest words are coherent and reffer to Tesla and Cryptocurrencies. Only "turkey" is not clearly close to thanksgiving, presumably as the topic "thanksgiving" has been hard to identify throughout the experiments.
+To verify that the neural network model has learned meaningful word embeddings, we feed it 7 manually chosen words (one for each topic, but never the name of the topic itself) and find the ten closest word in the embedding space using cosine similarity. We find that the word embeddings capture an impressive amount of meaning: The name of Formula1 driver Lewis Hamilton is closest to other driver's names as well as "formula" and "race". "Barcelona" maps to other sports clubs that played in the championsleague. "Vaccine" is close to health- and covid-related words while "Christmas" is similar to texttt{december} and "festive". For "Elon" and "BTC" the closest words are coherent and reffer to Tesla and Cryptocurrencies. Only "turkey" is not clearly close to thanksgiving, presumably as the topic "thanksgiving" has been hard to identify throughout the experiments.
 TODO:
 - Do the accuracies support this view?
 
