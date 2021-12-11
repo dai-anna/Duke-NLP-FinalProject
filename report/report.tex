@@ -1,6 +1,7 @@
 \documentclass[11pt]{article}
 \usepackage{geometry}
 \geometry{margin=0.95in}
+\usepackage[OT1]{fontenc}
 \usepackage{booktabs}
 \usepackage{adjustbox}
 %\usepackage{emoji}
@@ -18,12 +19,23 @@
 
 \section{Introduction}
 
-In this project, we have worked on tweet classification as a Natural Language Processing problem, more specifically, as a document classification problem. Twitter is a microblogging service where users post publicly visible "tweets", that are essentially texts with less than 280 characters. These tweets may also contain other media objects which are discarded for the purposes of this project. These tweets most often serve as discussion pieces as part of larger conversations. They are relevant to any number of topics under discussion. These "topics" are also often explicitly highlighted by the user using a "hashtag", i.e. text with '\#' followed by the topic name, or a commonly used shorthand for it. In our project, we treat these hashtags as "topics" for our document classification model, where each tweet is an instance of a document.
+In this project, we work on tweet classification as a Natural Language Processing problem, more specifically, as a document classification problem. Twitter is a microblogging service where users post publicly visible "Tweets", which are essentially texts with less than 280 characters. These Tweets may also contain other media objects which are discarded for the purposes of this project. These Tweets most often serve as discussion pieces as part of larger conversations. They are relevant to any number of topics under discussion. These "topics" are also often explicitly highlighted by the user using a "hashtag", i.e. text with '\#' followed by the topic name, or a commonly used shorthand for it. For the purpose of our project, we treat these hashtags as "topics" for our document classification model, where each tweet is an instance of a document.
 
 \section{Data}
-We have manually selected 7 topics, or hashtags for classification: crypto, tesla, championsleague, formula1, thanksgiving, holidays, covid19.
 
-These topics were intentionally selected to have topics that have some amount of overlap between them (holidays and thanksgiving) while also having topics easier to differentiate (crypto vs formula1). We scraped data using the python library twint \cite{twint}, scraping approximately 10,000 tweets for each of the seven topics. We also applied a few pre-processing steps before the next steps. This included tokenization of the tweets into words. [TODO: elimination of common words?]. Conversion of emojis into tokens (each appearance of an emoji is a token. Multiple emojis strung together are treated as different tokens in sequence). We also removed punctuation marks. Following these steps, we split our data into three parts using a 60:20:20 split to form a training dataset, a validation dataset, and a test dataset. 
+\subsection{Collection}
+
+We manually select seven popular topics (hashtags) for classification: crypto, tesla, championsleague, formula1, thanksgiving, holidays, and covid19.
+These topics were intentionally selected so that some topics have some degree of overlap between them (e.g. holidays and thanksgiving), others are easier to differentiate (e.g. crypto vs formula1), and is an independent topic that is often mentioned with the others (i.e. covid19). We leverage the python library twint \cite{twint} to scrape approximately 10,000 Tweets, or documents, for each of these seven topics.
+
+\subsection{Pre-Prosessing}
+
+As the raw scraped Tweets are messy, we spend some time to pre-process the data before proceeding with modeling. This included tokenization of the Tweets into words. [TODO: elimination of common words?]. Conversion of emojis into tokens (each appearance of an emoji is a token. Multiple emojis strung together are treated as different tokens in sequence). We also removed punctuation marks. Following these steps, we split our data into three parts using a 60:20:20 split to form a training dataset, a validation dataset, and a test dataset. 
+
+
+\noindent 
+
+
 
 \section{Methodology}
 
@@ -44,8 +56,9 @@ We used a Latent Dirichlet allocation (LDA) model as a generative model to learn
 
 \begin{center}
 \input{./benchmark_outputs/synth_only_model_classificationreport_synthdata.tex}	
-\end{center}
+\begin{center}
 Table 1: Benchmark results of neural net (trained on synthetic data only) on synthetic data
+\end{center}
 
 
 \subsection{Benchmarking on Real Data}
@@ -53,41 +66,54 @@ Table 1: Benchmark results of neural net (trained on synthetic data only) on syn
 \begin{center}
 \input{./benchmark_outputs/synth_only_model_classificationreport_realdata.tex}
 \end{center}
+\begin{center}
 Table 2: Benchmark results of neural net (trained on synthetic data only) on real data
+\end{center}
 
 
 
 \begin{center}
 \input{./benchmark_outputs/synthandreal_model_classificationreport_synthdata.tex}
-\end{center}
+\begin{center}
 Table 3: Benchmark results of neural net (trained on synthetic data and real data) on synthetic data
+\end{center}
 
 \begin{center}
 \input{./benchmark_outputs/synthandreal_model_classificationreport_realdata.tex}
 \end{center}
+\begin{center}
 Table 4: Benchmark results of neural net (trained on synthetic data and real data) on real data
+\end{center}
 
 \begin{center}
 \input{./benchmark_outputs/justreal_model_classificationreport_synthdata.tex}
 \end{center}
+\begin{center}
 Table 5: Benchmark results of neural net (trained on real data only) on synthetic data
+\end{center}
 
 
 \begin{center}
 \input{./benchmark_outputs/justreal_model_classificationreport_realdata.tex}
 \end{center}
+\begin{center}
 Table 6: Benchmark results of neural net (trained on real data only) on real data
+\end{center}
 
 
 \begin{center}
 \input{./benchmark_outputs/lda_classificationreport_synthdata.tex}
 \end{center}
+\begin{center}
 Table 7: Benchmark results of LDA classification on synthetic data
+\end{center}
 
 \begin{center}
 \input{./benchmark_outputs/lda_classificationreport_realdata.tex}
 \end{center}
+\begin{center}
 Table 8: Benchmark results of LDA classification on real data
+\end{center}
 
 
 \section{Conclusion}
