@@ -58,11 +58,9 @@ In this project, we have trained three discriminative models that are compared a
   \item Neural network trained only on real data
 \end{enumerate}
 
-\noindent TODO: Learning rate range test: final learning rate: 10\textsuperscript{-2.5}
 
 
-
-\noindent We begin by tuning the models hyperparameters on the synthetic data set. The tuning is implemented using the optuna library (\cite{optunapaper}) and its implementation of Tree-structured Parzen Estimators, a sequential model-based optimization approach to intelligently exploring hyperparameter search spaces (\cite{bergstraTPE}). Each experiment is run for 50 trials (1 trial = one entire training run) due to time constraints. Each model is trained for 20 epochs, but we employ an early stopping mechanisms to stop training after 3 epochs without validation accuracy increase as, empirically, our models converged quickly and performance plateaued. The batch size for our experiments is fixed at 64.
+\noindent We begin by tuning the models hyperparameters on the synthetic data set. The tuning is implemented using the optuna library (\cite{optunapaper}) and its implementation of Tree-structured Parzen Estimators, a sequential model-based optimization approach to intelligently exploring hyperparameter search spaces (\cite{bergstraTPE}). Each experiment is run for 50 trials (1 trial = one entire training run) due to time constraints. Each model is trained for 20 epochs, but we employ an early stopping mechanisms to stop training after 3 epochs without validation accuracy increase as, empirically, our models converged quickly and performance plateaued. The batch size for our experiments is fixed at 64. The learning rate is also kept at $10^{-2.5}$ for all experiments. This value was determined using the learning rate range test proposed by \cite{smith2018disciplined}. It works by fitting the model for a single epoch while changing the learning rate from small ($10^{-6}$) to large ($1$). Subsequently, we plot the loss over time, which hardly changes in the beginning of the epoch and diverges at the end of the epoch. The optimal learning rate can be visually identified close to the apex, i.e. the point where the loss decreases fastest.
 
 \begin{center}
 \begin{tabular}{llc}
@@ -95,7 +93,7 @@ In this project, we have trained three discriminative models that are compared a
     HP(1) & GRU dim & 64 & 48\\
     HP(2) & Dropout rate & 0.1 & 0.25\\
     HP(3) & Dense dim & 64 & 112\\
-    HP(4) & $\ell_2$ regularization & $10\mathrm{e}^{-9}$ & $2\mathrm{e}{-8}$\\
+    HP(4) & $\ell_2$ regularization & $10\mathrm{e}^{-9}$ & $2\mathrm{e}^{-8}$\\
 \bottomrule
 \end{tabular}
 \end{center}
