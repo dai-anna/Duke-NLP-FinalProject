@@ -18,25 +18,24 @@
 % --------------------------------------------------------------------------------
 \section{Introduction}
 
-In this project, we work on tweet classification as a Natural Language Processing problem, more specifically, as a document classification problem. Twitter is a microblogging service where users post publicly visible ``Tweets'', which are essentially texts with less than 280 characters. These Tweets may also contain other media objects which are discarded for the purposes of this project. These Tweets most often serve as discussion pieces as part of larger conversations. They are relevant to any number of topics under discussion. These ``topics" are also often explicitly highlighted by the user using a "hashtag", i.e. text with '\#' followed by the topic name, or a commonly used shorthand for it. For the purpose of our project, we treat these hashtags as "topics" for our document classification model, where each Tweet is an instance of a document.
+In this project, we work on tweet classification as a Natural Language Processing problem, more specifically, as a document classification problem. Twitter is a microblogging service where users post publicly visible ``Tweets'', which are essentially texts with less than 280 characters. These Tweets may also contain other media objects which are discarded for the purposes of this project. These Tweets most often serve as discussion pieces as part of larger conversations. They are relevant to any number of topics under discussion. These ``topics" are also often explicitly highlighted by the user using a ``hashtag", i.e. text with '\#' followed by the topic name, or a commonly used shorthand for it. For the purpose of our project, we treat these hashtags as "topics" for our document classification model, where each Tweet is an instance of a document.
 
 % --------------------------------------------------------------------------------
 \section{Data}
 
 \subsection{Collection}
-We manually select seven popular topics (hashtags) for classification: crypto, tesla, championsleague, formula1, thanksgiving, holidays, and covid19.
-These topics were intentionally selected so that some topics have some degree of overlap between them (e.g. holidays and thanksgiving), others are easier to differentiate (e.g. crypto vs formula1), and is an independent topic that is often mentioned with the others (i.e. covid19). We leverage the python library twint (\cite{twint}) to scrape approximately 10,000 Tweets, or documents, for each of these seven topics.
+We manually select seven popular topics (hashtags) for classification: \texttt{crypto}, \texttt{tesla}, \texttt{championsleague}, \texttt{formula1}, \texttt{thanksgiving}, \texttt{holidays}, and \texttt{covid19}. These topics were intentionally selected so that some topics have some degree of overlap between them (e.g. \texttt{holidays} and \texttt{thanksgiving}), others are easier to differentiate (e.g. \texttt{crypto} vs \texttt{formula1}), and one is an independent topic that is often mentioned with the others (i.e. \texttt{covid19}). We leverage the python library TWINT (\cite{twint}) to scrape approximately 10,000 Tweets, or documents, for each of these seven topics.
 
 
 \subsection{Pre-Processing}
 
-The raw scraped Tweets are quite messy, as they are cluttered with links to webpages, images, mentions of other Twitter users (i.e. @usernames) and other hashtags, so we spend some time to carefully pre-process the data before proceeding with modeling. As a first step, we tokenize each document into words. [TODO: elimination of common words?]. Conversion of emojis into tokens (each appearance of an emoji is a token. Multiple emojis strung together are treated as different tokens in sequence). We also removed punctuation marks. Following these steps, we split our data into three parts using a 60:20:20 split to form a training dataset, a validation dataset, and a testing dataset. 
+The raw scraped Tweets are quite messy as they are cluttered with links, images, mentions of other Twitter users (i.e. @usernames), other hashtags, etc., so we spend some time to carefully pre-process the data before proceeding with modeling. As a first step, we utilize regular expressions (regex) to remove any peripheral content such as URLs, mentions, hashtags, and cashtags. We then normalize our corpus by converting it to lowercase, stripping all punctuation marks, replacing all numbers with ``\textless number\textgreater" with regex and removing stopwords (e.g. and, the, to) using the NLTK stopwords library. Lastly, we tokenize each document into separate words. We specifically choose to retain all emojis as tokens because we believe they have value in topic classification, however, multiple emojis strung together were treated as different tokens. This resulted in an artificially inflated corpus, thus we leverage the emojis' unicode character codings to break up emojis into unique tokens. Following these steps, our clean corpus has a total vocabulary size of 16,003.
+\\[5pt]
+\noindent Once cleaned, we randomly split the corpus of 70,000 documents to form our train, validation, and test sets in a 60/20/20 ratio respectively. We will train models on the train set, find optimal hyperparameters using the validation set, and report all performance metrics in the \emph{Results} section on the test set, which is used only once to evaluate each model.
 
-The collected corpus of almost 70,000 tweets is randomly split into a training, validation, and test set in a 60/20/20 ratio. We will train models on the train set, find optimal hyperparameters using the validation set, and report all performance metrics in the \emph{Results} section on the test set, which is not used for any other purpose than evaluating each model once.
 
 
 
-\noindent 
 
 
 % --------------------------------------------------------------------------------
