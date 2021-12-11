@@ -57,8 +57,10 @@ In this project, we have trained three discriminative models that are compared a
   \item Model trained only on real data
 \end{itemize}
 
+\noindent Learning rate range test
 
-We begin by tuning the models hyperparameters on the synthetic data set.The tuning is implemented using the optuna library (\cite{optunapaper}) and its implementation of Tree-structured Parzen Estimators, a sequential model-based optimization approach to intelligently exploring hyperparameter search spaces (\cite{bergstraTPE}). Each experiments is run for 50 trials (1 trial = one entire training run) due to time constraints. Each model is trained for 20 epochs, but we employ an early stopping mechanisms to stop training after 3 epochs without validation accuracy increase as empirically, our models converged quickly and performance plateaued. The batch size for our experiments is fixed at 64.
+
+\noindent We begin by tuning the models hyperparameters on the synthetic data set. The tuning is implemented using the optuna library (\cite{optunapaper}) and its implementation of Tree-structured Parzen Estimators, a sequential model-based optimization approach to intelligently exploring hyperparameter search spaces (\cite{bergstraTPE}). Each experiment is run for 50 trials (1 trial = one entire training run) due to time constraints. Each model is trained for 20 epochs, but we employ an early stopping mechanisms to stop training after 3 epochs without validation accuracy increase as, empirically, our models converged quickly and performance plateaued. The batch size for our experiments is fixed at 64.
 
 \begin{center}
 \begin{tabular}{llc}
@@ -77,9 +79,9 @@ We begin by tuning the models hyperparameters on the synthetic data set.The tuni
 	Table X: Hyperparameters and their search spaces.
 \end{center}
 
-After finding the optimal hyperparameter configuration (shown in Table XX), we refit the model using the optimal parameters and benchmark its performance on the synthetic and real data. Subsequently, we continue training the same model on the real data set. We hypothesize that pre-training on synthetic data might help the model converge faster on real-world data. After training for another 20 epochs, we benchmark the model again.
+\noindent After finding the optimal hyperparameter configuration (shown in Table XX), we refit the model using the optimal parameters and benchmark its performance on the synthetic and real data. Subsequently, we continue training the same model on the real data set. We hypothesize that pre-training on synthetic data might help the model converge faster on real-world data. After training for another 20 epochs, we benchmark the model again.
 
-To gauge whether pre-training on synthetic data had an impact on model performance or training behavior, we conduct another experiment. We start a new hyperparameter search with the same model architecture and search space, but this time on the real data set. We use the optimal parameters to create a third neural network model that has never seen synthetic data and benchmark it on both, the synthetic and real test set. Table XX shows the optimal parameter configurations found in each run.
+\noindent To gauge whether pre-training on synthetic data had an impact on model performance or training behavior, we conduct another experiment. We start a new hyperparameter search with the same model architecture and search space, but this time on the real data set. We use the optimal parameters to create a third neural network model that has never seen synthetic data and benchmark it on both, the synthetic and real test set. Table XX shows the optimal parameter configurations found in each run.
 
 
 \begin{center}
@@ -163,7 +165,7 @@ Table 5 \& 6: Benchmark results of neural net (trained on real data only)
 
 \subsection{A Look at the Learned Word Embeddings}
 To verify that the neural network model has learned meaningful word embeddings, we feed it seven manually chosen words (one closely related to each topic, but never the name of the topic itself) and find the ten closest word in the embedding space using cosine similarity. We find that the word embeddings capture an impressive amount of meaning: The name of Formula 1 driver Lewis Hamilton is closest to other drivers' names as well as ``formula" and ``race". ``Barcelona" maps to other sports clubs that plays in the Champions League. Similarly,  we observe that ``vaccine" is close to health- and covid-related words while ``Christmas" is similar to ``December" and ``festive". For ``Elon" and ``BTC" the closest words are coherent and refer to Tesla and Cryptocurrencies. Only ``turkey" is not clearly close to Thanksgiving, presumably as the topic \texttt{thanksgiving} has been hard to identify throughout the experiments. It is interesting to note that various relevant emojis have been identified as closely-related to each topic word, which confirms our initial hypothesis that emojis can be as meaningful as other words.
-\\[5pt]
+\\
 
 \begin{adjustbox}{width=\columnwidth,center}
 \input{embeddings_similar_words.tex}
