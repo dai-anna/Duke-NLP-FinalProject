@@ -4,7 +4,6 @@
 \usepackage[OT1]{fontenc}
 \usepackage{booktabs}
 \usepackage{adjustbox}
-\usepackage{emoji}
 \usepackage[backend=bibtex8,style=authoryear]{biblatex}
 \bibliography{lib}
 
@@ -129,8 +128,8 @@ Table 5 \& 6: Benchmark results of neural net (trained on real data only)
 \end{center}
 
 
-\subsection{Learned Word Embeddings}
-To verify that the neural network model has learned meaningful word embeddings, we feed it seven manually chosen words (one closely related to each topic, but never the name of the topic itself) and find the ten closest word in the embedding space using cosine similarity. We find that the word embeddings capture an impressive amount of meaning: The name of Formula 1 driver Lewis Hamilton is closest to other drivers' names as well as ``formula" and ``race". ``Barcelona" maps to other sports clubs that plays in the Champions League. Similarly,  we observe that ``vaccine" is close to health- and covid-related words while ``Christmas" is similar to texttt{december} and ``festive". For ``Elon" and ``BTC" the closest words are coherent and refer to Tesla and Cryptocurrencies. Only ``turkey" is not clearly close to thanksgiving, presumably as the topic ``thanksgiving" has been hard to identify throughout the experiments. It is interesting to note that various relevant emojis have been identified as closely-related to each topic word, which confirms our initial hypothesis that emojis can be as meaningful as other words.
+\subsection{A Look at the Learned Word Embeddings}
+To verify that the neural network model has learned meaningful word embeddings, we feed it seven manually chosen words (one closely related to each topic, but never the name of the topic itself) and find the ten closest word in the embedding space using cosine similarity. We find that the word embeddings capture an impressive amount of meaning: The name of Formula 1 driver Lewis Hamilton is closest to other drivers' names as well as ``formula" and ``race". ``Barcelona" maps to other sports clubs that plays in the Champions League. Similarly,  we observe that ``vaccine" is close to health- and covid-related words while ``Christmas" is similar to december and ``festive". For ``Elon" and ``BTC" the closest words are coherent and refer to Tesla and Cryptocurrencies. Only ``turkey" is not clearly close to thanksgiving, presumably as the topic ``thanksgiving" has been hard to identify throughout the experiments. It is interesting to note that various relevant emojis have been identified as closely-related to each topic word, which confirms our initial hypothesis that emojis can be as meaningful as other words.
 
 TODO:
 - Rephrase the emojis bit?
@@ -145,11 +144,14 @@ TODO:
 \end{center}
 
 % --------------------------------------------------------------------------------
-\section{Discussion and Conclusion}
-- NN synthonly \& LDA super similar
+\section{Discussion}
+- NN synthonly \& LDA super similar (with same bad generalization)
 - Synthandreal \& realonly have similar real world performance
+- F1 and holiday seem to be different between synth data and real data (good acc on real data but bad on synth data)
 
 
+% --------------------------------------------------------------------------------
+\section{Conclusion}
 
 
 % --------------------------------------------------------------------------------
