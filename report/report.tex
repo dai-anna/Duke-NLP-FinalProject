@@ -101,10 +101,8 @@ In this project, we have trained three discriminative models that are compared a
 	Table XX: Optimal hyperparameter configuration for models on synthetic and real data
 \end{center}
 
-
-
-
 % --------------------------------------------------------------------------------
+
 \section{Results}
 \subsection{LDA Model}
 
@@ -168,7 +166,7 @@ Table 5 \& 6: Benchmark results of neural net (trained on real data only)
 
 
 \subsection{A Look at the Learned Word Embeddings}
-To verify that the neural network model has learned meaningful word embeddings, we feed it seven manually chosen words (one closely related to each topic, but never the name of the topic itself) and find the ten closest word in the embedding space using cosine similarity. We find that the word embeddings capture an impressive amount of meaning: The name of Formula 1 driver Lewis Hamilton is closest to other drivers' names as well as ``formula" and ``race". ``Barcelona" maps to other sports clubs that plays in the Champions League. Similarly,  we observe that ``vaccine" is close to health- and covid-related words while ``Christmas" is similar to ``December" and ``festive". For ``Elon" and ``BTC" the closest words are coherent and refer to Tesla and Cryptocurrencies. Only ``turkey" is not clearly close to Thanksgiving, presumably as the topic \texttt{thanksgiving} has been hard to identify throughout the experiments. It is interesting to note that various relevant emojis have been identified as closely-related to each topic word, which confirms our initial hypothesis that emojis can be as meaningful as word tokens.
+To verify that the neural network model has learned meaningful word embeddings, we feed it seven manually chosen words (one closely related to each topic, but never the name of the topic itself) and find the ten closest word in the embedding space using cosine similarity. We find that the word embeddings capture an impressive amount of meaning: The name of Formula 1 driver Lewis Hamilton is closest to other drivers' names as well as ``formula" and ``race". ``Barcelona" maps to other sports clubs that plays in the Champions League. Similarly,  we observe that ``vaccine" is close to health- and covid-related words while ``Christmas" is similar to ``December" and ``festive". For ``Elon" and ``BTC" the closest words are coherent and refer to Tesla and Cryptocurrencies. Only words associated with ``turkey" are not clearly close to Thanksgiving, presumably as the topic \texttt{thanksgiving} has been hard to identify throughout the experiments. Nevertheless, the turkey emoji and ``november" are related tokens. It is interesting to note that various relevant emojis have been identified as closely-related to each topic word, which confirms our initial hypothesis that emojis can be as meaningful as word tokens.
 \\
 
 \begin{adjustbox}{width=\columnwidth,center}
@@ -179,6 +177,7 @@ To verify that the neural network model has learned meaningful word embeddings, 
 \end{center}
 
 % --------------------------------------------------------------------------------
+
 \section{Discussion}
 - NN synthonly \& LDA super similar (with same bad generalization)
 - Synthandreal \& realonly have similar real world performance
@@ -192,7 +191,12 @@ To verify that the neural network model has learned meaningful word embeddings, 
 
 % --------------------------------------------------------------------------------
 \section{Conclusion}
+In this project, we collected data from twitter by scraping tweets for seven topics (hashtags). We used the data on these topics to build a generative model, benchmark its performance, and used it to generate synthetic data. Based on this synthetic data we trained several different neural networks. 
+Our results indicate that the simple LDA model generates data that might not fully align with real world tweeets. While the LDA excels when used on synthetic data, it fails to perform on the real data set. The same holds true for the neural network that has been trained on synthetic data only. However, the neural networks we built in in this project perform well on real data \emph{if they are trained on real data} achieving accuracies of around 84\%.
 
+For these neural networks we were able to show that the learned word embeddings managed to capture the expected word-topic relationships. Given the large number of unique words induced by slang and misspelled words that are common on Twitter, we still think training our own word embeddings over using a pre-trained set is adequate.
+
+Future work on this problem could explore different regularization techniques: We see that the neural networks achieve training accuracies of over 95\% on the training set, which does not fully reflect in their ability to generalize to the validation and test set.
 
 % --------------------------------------------------------------------------------
 \newpage

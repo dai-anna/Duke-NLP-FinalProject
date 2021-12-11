@@ -29,8 +29,27 @@ make data-collect
 ```
 
 #### 4) Train LDA model
-TBD
+```bash
+cd src
+python3 lda_modeling.py
+```
 
 
-#### 5) Train Neural Network
-TBD
+#### 5) Train Neural Network (Requires multiple hours on a GPU enabled device)
+```bash
+cd src
+# tune hyperparameters
+python3 tf_hyperparameter_tuning.py
+```
+
+Visually inspect results in `visualize_study.ipynb`
+
+```bash
+# run neural network with chosen params
+cd src
+python3 tf_train_model_with_best_params.py
+```
+
+
+
+
