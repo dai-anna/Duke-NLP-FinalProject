@@ -5,18 +5,9 @@
 \usepackage{booktabs}
 \usepackage{adjustbox}
 %\usepackage{emoji}
-<<<<<<< HEAD
-%\usepackage{biblatex}
-%\bibliographystyle{plain}
-%\bibliography{lib}
-=======
+
 \usepackage[backend=bibtex8,style=authoryear]{biblatex}
-
 \bibliography{lib}
-%\bibliographystyle{plain}
-
->>>>>>> e549bf74e8fc734725d5b2e6d21daad1248bafd0
-
 
 \title{\vspace{-1.5cm}IDS703 Final Project Report}
 \author{Anna Dai, Satvik Kishore, Moritz Wilksch}
@@ -34,14 +25,9 @@ In this project, we work on tweet classification as a Natural Language Processin
 \section{Data}
 
 \subsection{Collection}
-
-<<<<<<< HEAD
-We manually select seven popular topics (i.e. hashtags) for classification: crypto, tesla, championsleague, formula1, thanksgiving, holidays, and covid19.
-These topics were intentionally selected so that some topics have some degree of overlap between them (e.g. holidays and thanksgiving), others are easier to differentiate (e.g. crypto vs formula1), and is an independent topic that is often mentioned with the others (i.e. covid19). We leverage the python library twint \cite{twint} to scrape approximately 10,000 Tweets (i.e. documents) for each of these seven topics.
-=======
 We manually select seven popular topics (hashtags) for classification: crypto, tesla, championsleague, formula1, thanksgiving, holidays, and covid19.
 These topics were intentionally selected so that some topics have some degree of overlap between them (e.g. holidays and thanksgiving), others are easier to differentiate (e.g. crypto vs formula1), and is an independent topic that is often mentioned with the others (i.e. covid19). We leverage the python library twint (\cite{twint}) to scrape approximately 10,000 Tweets, or documents, for each of these seven topics.
->>>>>>> e549bf74e8fc734725d5b2e6d21daad1248bafd0
+
 
 \subsection{Pre-Processing}
 
@@ -55,15 +41,8 @@ The collected corpus of almost 70,000 tweets is randomly split into a training, 
 
 
 % --------------------------------------------------------------------------------
-<<<<<<< HEAD
+
 \section{Modeling}
-=======
-\section{Methodology}
-\subsection{Workflow}
-The collected corpus of almost 70,000 tweets is randomly split into a training, validation, and test set in a 60/20/20 ratio. We will train models on the train set, find optimal hyperparameters using the validation set, and report all performance metrics in the \emph{Results} section on the test set, which is not used for any other purpose than evaluating each model once. 
-
->>>>>>> e549bf74e8fc734725d5b2e6d21daad1248bafd0
-
 \subsection{Generative Model}
 We use a Latent Dirichlet Allocation (LDA) model as a generative model to learn from the corpus we have collected. This type of model does not require any hyperparamter tuning, and thus is trained using a combination of the training and validation dataset. We used the LDA implementation from scikit-learn (\cite{sklearn}). It is fit to the corpus to find seven separate topics, as this is the number of actual topics in the training set. Subsequently, for each inferred topic, we manually inspect the top 50 words that are associated with it to assign it a name. This manual step is necessary, as the order of topics is not preserved. In fact, the LDA model does not even guarantee to find the same topics that were collected in the original data set. This shortcoming will be discussed in the \emph{Results} and \emph{Conclusion} sections. 
 To use the LDA for document classification,  we let it infer the topic distribution of each document in the test set and use the $argmax(\cdot)$ function to assign each document the topic that is most prevalent according to the LDA.
@@ -106,14 +85,13 @@ Table 2: Benchmark results of neural net (trained on synthetic data only) on rea
 
 \subsection{Benchmarking on Real Data}
 
-<<<<<<< HEAD
-=======
 \begin{center}
 \input{./benchmark_outputs/synthandreal_model_classificationreport_synthdata.tex}
 \end{center}
+\begin{center}
 Table 3: Benchmark results of neural net (trained on synthetic data and real data) on synthetic data
 \end{center}
->>>>>>> e549bf74e8fc734725d5b2e6d21daad1248bafd0
+
 
 \begin{center}
 \input{./benchmark_outputs/synthandreal_model_classificationreport_synthdata.tex}
