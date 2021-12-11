@@ -11,6 +11,8 @@ from data_collecting import hashtags
 from tensorflow import keras
 import os
 from sklearn.metrics import classification_report
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+
 
 #%%
 try:
@@ -71,9 +73,9 @@ lda_topic_real_topic_mapper_real = {
 
 #%%
 # --------------------------- Benchmarking Switches ---------------------------
-NN_SYNTHONLY_BENCHMARKING = False
-NN_SYNTH_REAL_BENCHMARKING = False
-NN_REALONLY_BENCHMARKING = False
+NN_SYNTHONLY_BENCHMARKING = True
+NN_SYNTH_REAL_BENCHMARKING = True
+NN_REALONLY_BENCHMARKING = True
 LDA_BENCHMARKING = True
 
 #%%
@@ -91,7 +93,7 @@ if NN_SYNTHONLY_BENCHMARKING or NN_SYNTH_REAL_BENCHMARKING or NN_REALONLY_BENCHM
             pd.DataFrame(
                 classification_report(preds, ytest.cat.codes.values, output_dict=True)
             )[[str(x) for x in range(7)]]
-            .rename(lda_topic_real_topic_mapper, axis=1)
+            .rename(lda_topic_real_topic_mapper_real, axis=1)
             .round(3)
             .T.assign(support=lambda d: d["support"].astype("int"))
         )
@@ -213,7 +215,7 @@ if NN_REALONLY_BENCHMARKING:
         synth_xtest,
         synth_ytest,
         "../report/benchmark_outputs/justreal_model_classificationreport_synthdata.tex",
-        "Benchmark results of neural net (trained on real data) on synthetic data",
+        "Benchmark results of neural net (trained only on real data) on synthetic data",
     )
 
     do_benchmark_and_save(
@@ -221,13 +223,14 @@ if NN_REALONLY_BENCHMARKING:
         xtest,
         ytest,
         "../report/benchmark_outputs/justreal_model_classificationreport_realdata.tex",
-        "Benchmark results of neural net (trained on real data) on real data",
+        "Benchmark results of neural net (trained only on real data) on real data",
     )
 
 #%%
 # --------------------------- Loading LDA model ---------------------------
 if LDA_BENCHMARKING:
-    from lda_modeling import cv
+    cv = CountVectorizer(vocabulary=encoder.token_to_index)
+    lda = joblib.load("../artefacts/lda_model.joblib")
 
     def do_benchmark_and_save_lda(model, test, mapper, tex_output_path, caption):
         """Conducts lda benchmark on test set and saves results to tex file."""
@@ -241,13 +244,13 @@ if LDA_BENCHMARKING:
         benchmark_df = (
             pd.DataFrame(classification_report(ytest_lda, preds_lda, output_dict=True))
             .round(3)
-            .T.rename(index={"covid19": "covid"})
+            .T.rename(index={"covid": "covid19"})
             .assign(support=lambda d: d["support"].astype("int"))
             .reindex(
                 [
                     "thanksgiving",
                     "formula1",
-                    "covid",
+                    "covid19",
                     "championsleague",
                     "crypto",
                     "tesla",
@@ -267,8 +270,6 @@ if LDA_BENCHMARKING:
                 index=True,
                 bold_rows=False,
             )
-
-    lda = joblib.load("../artefacts/lda_model.joblib")
 
     # --------------------------- LDA model benchmarks ---------------------------
 
