@@ -30,7 +30,7 @@ In this project, we work on tweet classification as a Natural Language Processin
 \subsection{Collection}
 
 We manually select seven popular topics (hashtags) for classification: crypto, tesla, championsleague, formula1, thanksgiving, holidays, and covid19.
-These topics were intentionally selected so that some topics have some degree of overlap between them (e.g. holidays and thanksgiving), others are easier to differentiate (e.g. crypto vs formula1), and is an independent topic that is often mentioned with the others (i.e. covid19). We leverage the python library twint \cite{twint} to scrape approximately 10,000 Tweets, or documents, for each of these seven topics.
+These topics were intentionally selected so that some topics have some degree of overlap between them (e.g. holidays and thanksgiving), others are easier to differentiate (e.g. crypto vs formula1), and is an independent topic that is often mentioned with the others (i.e. covid19). We leverage the python library twint (\cite{twint}) to scrape approximately 10,000 Tweets, or documents, for each of these seven topics.
 
 \subsection{Pre-Prosessing}
 
@@ -96,7 +96,7 @@ Table 2: Benchmark results of neural net (trained on synthetic data only) on rea
 
 \begin{center}
 \input{./benchmark_outputs/synthandreal_model_classificationreport_synthdata.tex}
-\begin{center}
+\end{center}
 Table 3: Benchmark results of neural net (trained on synthetic data and real data) on synthetic data
 \end{center}
 
