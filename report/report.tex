@@ -1,53 +1,55 @@
 \documentclass[11pt]{article}
-\usepackage{geometry}
-\geometry{margin=.94in}
+\usepackage[top=.85in, bottom=.85in, left=0.95in, right=0.95in]{geometry}
 \usepackage[OT1]{fontenc}
 \usepackage{booktabs}
 \usepackage{adjustbox}
+\usepackage{hyperref}
 \usepackage[backend=bibtex8,style=authoryear]{biblatex}
 \bibliography{lib}
-\title{\vspace{-1.5cm}IDS703 Final Project Report}
+\title{\vspace{-1.8cm}IDS703 Final Project Report\footnote{\url{https://github.com/dai-anna/Duke-NLP-FinalProject}}}
 \author{Anna Dai, Satvik Kishore, Moritz Wilksch}
 \date{December 12th, 2021}
-
 \begin{document}
 \maketitle
-
 % --------------------------------------------------------------------------------
 
 \section{Introduction}
 
-In this project, we work on tweet classification as a Natural Language Processing problem, more specifically, as a document classification problem. Twitter is a microblogging service where users post publicly visible ``Tweets", which are essentially texts with less than 280 characters. These Tweets may also contain other media objects which are discarded for the purposes of this project. These Tweets most often serve as discussion pieces as part of larger conversations. They are relevant to any number of topics under discussion. These ``topics" are also often explicitly highlighted by the user using a ``hashtag", i.e. text with `\#' followed by the topic name, or a commonly used shorthand for it. For the purpose of our project, we treat these hashtags as ``topics" for our document classification model, where each Tweet is an instance of a document.
+In this project, we work on Tweet classification as a Natural Language Processing (NLP) problem, more specifically, as a document classification problem. Twitter is a microblogging service where users post publicly visible ``Tweets", which are essentially texts with less than 280 characters. These Tweets may also contain other media objects which are discarded for the purposes of this project. These Tweets most often serve as discussion pieces as part of larger conversations. Tweets may be relevant to any number of topics under discussion, and these ``topics" are also often explicitly highlighted by the user using a ``hashtag", i.e. text with `\#' followed by the topic name, or a commonly used shorthand for it. For the purpose of our project, we treat these hashtags as ``topics" for our document classification model, where each Tweet is an instance of a document.
 
 % --------------------------------------------------------------------------------
+
 \section{Data}
 
 \subsection{Collection}
-We manually select seven popular topics (hashtags) for classification: \texttt{crypto}, \texttt{tesla}, \texttt{championsleague}, \texttt{formula1}, \texttt{thanksgiving}, \texttt{holidays}, and \texttt{covid19}. These topics were intentionally selected so that some topics have some degree of overlap between them (e.g. \texttt{holidays} and \texttt{thanksgiving}), others are easier to differentiate (e.g. \texttt{crypto} vs \texttt{formula1}), and one is an independent topic that is often mentioned with the others (i.e. \texttt{covid19}). We leverage the python library TWINT (\cite{twint}) to scrape approximately 10,000 Tweets, or documents, for each of these seven topics.
+We manually select seven popular topics (hashtags) for classification: \texttt{crypto}, \texttt{tesla},  \texttt{formula1}, \texttt{championsleague}, \texttt{thanksgiving}, \texttt{holidays}, and \texttt{covid19}. These topics were intentionally selected so that some topics have some degree of overlap between them (e.g. \texttt{holidays} and \texttt{thanksgiving}), others are easier to differentiate (e.g. \texttt{crypto} vs \texttt{formula1}), and one is an independent topic that is often mentioned with the others (i.e. \texttt{covid19}). We leverage the python library TWINT (\cite{twint}) as well as the Twitter API directly (legally) to scrape approximately 10,000 Tweets, or documents, for each of these seven topics.
 
 \subsection{Pre-Processing}
 
-The raw scraped Tweets are quite messy as they are cluttered with media objects like links, images, mentions of other Twitter users (i.e. @usernames), other hashtags, etc., so we spend some time to carefully pre-process the data before proceeding with modeling. As a first step, we utilize regular expressions (regex) to remove any peripheral content such as URLs, mentions, hashtags, and cashtags. We then normalize our corpus by converting it to lowercase, stripping all punctuation marks, replacing all numbers with ``\textless number\textgreater" with regex and removing stopwords (e.g. and, the, to) using the NLTK stopwords library. Lastly, we tokenize each document into separate words and encode these words using a TorchNLP's WhitespaceEncoder. We specifically choose to retain all emojis as tokens because we believe they have value in topic classification, however, multiple emojis strung together were treated as different tokens, resulting in an artificially inflated corpus. Thus, we leverage the emojis' unicode character codings to break up emojis into unique tokens.
+The raw scraped Tweets are quite messy as they are cluttered with media objects like links, images, mentions of other Twitter users (i.e. @usernames), other hashtags, etc., so we spend some time to carefully pre-process the data before proceeding with modeling. As a first step, we utilize regular expressions (regex) to remove any peripheral content such as URLs, mentions, hashtags, and cashtags. We then normalize our corpus by converting it to lowercase, stripping all punctuation marks, replacing all numbers with ``\textless number\textgreater" with regex and removing stopwords (e.g. and, the, to) using the NLTK stopwords library. Lastly, we tokenize each document into separate words and encode these words using TorchNLP's WhitespaceEncoder. We specifically choose to retain all emojis as tokens because we believe they have value in topic classification, however, multiple emojis strung together were treated as different tokens, resulting in an artificially inflated corpus. Thus, we leverage the emojis' unicode character codings to break up them up into unique tokens.
 \\[5pt]
-\noindent Once cleaned, we randomly split the corpus of 70,000 documents to form our train, validation, and test data sets in a 60/20/20 ratio respectively. We will train models on the train set, find optimal hyperparameters using the validation set, and report all performance metrics in the \emph{Results} section on the test set, which is used only once to evaluate each model.
+\noindent Once cleaned, we randomly split the corpus of 70,000 documents to form our train, validation, and test data sets in a 60/20/20 ratio. We will train models on the train set, find optimal hyperparameters using the validation set, and report all performance metrics in the \emph{Results} section on the test set, which is used only once to evaluate each model.
 
 % --------------------------------------------------------------------------------
 
 \section{Modeling}
 \subsection{Generative Model}
-We use a Latent Dirichlet Allocation (LDA) model as a generative model to learn from the corpus we have collected. This type of model does not require any hyperparamter tuning, and thus is trained using a combination of the training and validation dataset. We used the LDA implementation from scikit-learn (\cite{sklearn}). It is fit to the corpus to infer seven separate topics, as this is the number of actual topics in the training set. Subsequently, for each inferred topic, we manually inspect the top 50 words that are associated with it in order to assign it a name or label. This manual step is necessary, as the order of topics is not preserved. In fact, the LDA model does not even guarantee to find the same topics that were collected in the original data set. This shortcoming will be discussed in the \emph{Results} and \emph{Conclusion} sections. 
+We use a Latent Dirichlet Allocation (LDA) model as a generative model to learn from the corpus we have collected. This type of model does not require any hyperparamter tuning, and thus is trained using a combination of the training and validation dataset. We used the LDA implementation from scikit-learn (\cite{sklearn}). It is fit to the corpus to infer seven separate topics, as this is the number of actual topics in the training set. Subsequently, for each inferred topic, we manually inspect the top 50 words that are associated with it in order to assign it its topic label. This manual step is necessary as the order of topics is not preserved. In fact, the LDA model does not even guarantee to find the same topics that were collected in the original data set. This shortcoming will be discussed in the \emph{Discussion} section. 
 To use the LDA for document classification,  we let the model infer the topic distribution of each document in the test set and use the $argmax(\cdot)$ function to assign each document the topic that is most prevalent according to the LDA.
-Finally, the LDA is used to generate synthetic data. For each topic, we sample 10,000 artificial documents, the length of which is sampled from the empirical distribution of tweet lengths each time. Similar to the actual data set, the synthetic data set is also split into a train, validation, and test set using a 60/20/20 ratio split.
+Finally, the LDA is used to generate synthetic data. For each topic, we sample 10,000 artificial documents, the length of which is sampled from the empirical distribution of tweet lengths each time. Similar to the actual data, the synthetic data is also split in a 60/20/20 ratio into a train, validation, and test set.
 
 
 \subsection{Discriminative Model}
-We develop a neural network model as a discriminative model in order to classify input documents into their respective categories. These documents can arise from the synthetic data generated by the LDA or the real data scraped from Twitter. The model architecture we employ is a bidirectional Gated Recurrent Unit (GRU) at its core. This model is able to accept inputs of varying lengths and outputs a vector of length seven for each input document. This output is the vector of predicted probabilities generated by the final Softmax layer for each of the seven topics. This model is implemented and trained using Keras on Tensorflow (\cite{tensorflow}). We use the training data to optimize model parameters using backpropogation while comparing the loss and accuracy on the validation model to optimize the hyperparameters. We apply cross entropy loss as the loss function to the final Softmax layer in the model to generate our final topic classifications.
+We develop a neural network model as a discriminative model in order to classify input documents into their respective categories. These documents can arise from the synthetic data generated by the LDA or the real data scraped from Twitter. The model architecture we employ is a bidirectional Gated Recurrent Unit (GRU) at its core. This model is able to accept inputs of varying lengths and outputs a vector of length seven for each input document. This output is the vector of predicted probabilities generated by the final Softmax layer for each of the seven topics. This model is implemented and trained using Keras on Tensorflow (\cite{tensorflow}). We use the training data to optimize model parameters using backpropagation while comparing the loss and accuracy on the validation model to optimize the hyperparameters. We apply cross entropy loss as the loss function to the final Softmax layer in the model to generate our final topic classifications.
 
 
 \subsubsection{Model Architecture}
-\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{architecture.drawio.png}
+\begin{figure}[h!]
+  \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{architecture.drawio.png}
+    \caption{Neural Network Model Architecture}
+\end{figure}
 
-\noindent The model contains three essential subparts: the embedding layer, the bidirectional GRU layers, and the final densely connected layers. Each layer has one or more hyperparameters (denoted by $HP(i)$) that are subject to tuning. Documents are fed into the model in the form of tokens identified from the encoder. There are 16,003 unique tokens identified in the training data. The embedding layer is a neural net that converts each token into a vector of length $HP(0)$. These embedded vectors are then received as input by the two GRU layers. GRU are a form of recurrent neural networks that use gates to better pass long term memory than simple recurrent neural nets (RNN), but have fewer parameters than long short-term memory (LSTM) neural nets. This allows for GRUs to be more expressive than simple RNNs faster and easier to train than LSTMs. Research also suggest that performance of GRUs are comparable with LSTMs for some natural language processing models (\cite{GRU}). GRU also do not differentiate between the output and hidden vectors and the size of these hidden vectors are $HP(1)$. The final hidden vectors of both GRUs (forward and backward) are then concatenated and fed into a dropout layer with dropout rate $HP(2)$ followed by a densely connected network of two layers separated by another dropout layer with the same rate of $HP(2)$. These two dense layers are of size $HP(3)$ and 7 with ReLU and Softmax activation functions respectively. We also implement $\ell_2$ (Ridge) regularization by a factor of $HP(4)$ in the GRU, ReLU and Softmax dense layers to reduce overfitting. All training is done using the Adam Optimizer.
+\noindent The model contains three essential subparts: the embedding layer, the bidirectional GRU layers, and the final densely connected layers. Each layer has one or more hyperparameters (denoted by $HP(i)$) that are subject to tuning. Documents are fed into the model in the form of tokens identified from the encoder. There are 16,003 unique tokens identified in the training data. The embedding layer is a lookup table that converts each token into a vector of length $HP(0)$. We transform every document to a length of 60 tokens by either padding with zeros or cropping it, so that the entire network is able to learn in batches of tensors. These embedded vectors are then received as input by the two GRU layers. GRU are a form of recurrent neural networks that use gates to better pass long term memory than simple recurrent neural nets (RNN), but have fewer parameters than long short-term memory (LSTM) neural nets. This allows for GRUs to be more expressive than simple RNNs and faster and easier to train than LSTMs. Research also suggest that performance of GRUs are comparable with LSTMs for some NLP models (\cite{GRU}). GRU also do not differentiate between the output and hidden vectors and the size of these hidden vectors are $HP(1)$. The final hidden vectors of both GRUs (forward and backward) are then concatenated and fed into a dropout layer with dropout rate $HP(2)$ followed by a densely connected network of two layers separated by another dropout layer with the same rate of $HP(2)$. These two dense layers are of size $HP(3)$ and 7 with ReLU and Softmax activation functions respectively. We also implement $\ell_2$ (Ridge) regularization by a factor of $HP(4)$ in the GRU, ReLU and Softmax dense layers to reduce overfitting. All training is done using the Adam Optimizer.
 
 \subsubsection{Training Process}
 In this project, we have trained three discriminative models that are compared and evaluated:
@@ -57,8 +59,6 @@ In this project, we have trained three discriminative models that are compared a
   \item Neural network trained on synthetic data with continued training on real data
   \item Neural network trained only on real data
 \end{enumerate}
-
-
 
 \noindent We begin by tuning the models hyperparameters on the synthetic data set. The tuning is implemented using the optuna library (\cite{optunapaper}) and its implementation of Tree-structured Parzen Estimators, a sequential model-based optimization approach to intelligently exploring hyperparameter search spaces (\cite{bergstraTPE}). Each experiment is run for 50 trials (1 trial = one entire training run) due to time constraints. Each model is trained for 20 epochs, but we employ an early stopping mechanisms to stop training after 3 epochs without validation accuracy increase as, empirically, our models converged quickly and performance plateaued. The batch size for our experiments is fixed at 64. The learning rate is also kept at $10^{-2.5}$ for all experiments. This value was determined using the learning rate range test proposed by \cite{smith2018disciplined}. It works by fitting the model for a single epoch while changing the learning rate from small ($10^{-6}$) to large ($1$). Subsequently, we plot the loss over time, which hardly changes in the beginning of the epoch and diverges at the end of the epoch. The optimal learning rate can be visually identified close to the apex, i.e. the point where the loss decreases fastest.
 
@@ -76,12 +76,12 @@ In this project, we have trained three discriminative models that are compared a
 \end{tabular}
 \end{center}
 \begin{center}
-	Table X: Hyperparameters and their search spaces.
+	Table 1: Hyperparameters and their search spaces.
 \end{center}
 
-\noindent After finding the optimal hyperparameter configuration (shown in Table XX), we refit the model using the optimal parameters and benchmark its performance on the synthetic and real data. Subsequently, we continue training the same model on the real data set. We hypothesize that pre-training on synthetic data might help the model converge faster on real-world data. After training for another 20 epochs, we benchmark the model again.
-
-\noindent To gauge whether pre-training on synthetic data had an impact on model performance or training behavior, we conduct another experiment. We start a new hyperparameter search with the same model architecture and search space, but this time on the real data set. We use the optimal parameters to create a third neural network model that has never seen synthetic data and benchmark it on both, the synthetic and real test set. Table XX shows the optimal parameter configurations found in each run.
+\noindent After finding the optimal hyperparameter configuration (shown in Table 2 below), we refit the model using the optimal parameters and benchmark its performance on the synthetic and real data. Subsequently, we continue training the same model on the real data set. We hypothesize that pre-training on synthetic data might help the model converge faster on real-world data. After training for another 20 epochs, we benchmark the model again.
+\\[5pt]
+\noindent To gauge whether pre-training on synthetic data had an impact on model performance or training behavior, we conduct another experiment. We start a new hyperparameter search with the same model architecture and search space, but this time on the real data set. We use the optimal parameters to create a third neural network model that has never seen synthetic data and benchmark it on both, the synthetic and real test set. Table 2 shows the optimal parameter configurations found in each run.
 
 
 \begin{center}
@@ -98,24 +98,24 @@ In this project, we have trained three discriminative models that are compared a
 \end{tabular}
 \end{center}
 \begin{center}
-	Table XX: Optimal hyperparameter configuration for models on synthetic and real data
+	Table 2: Optimal hyperparameter configuration for models on synthetic and real data
 \end{center}
 
-
-
-
 % --------------------------------------------------------------------------------
+
 \section{Results}
 \subsection{LDA Model}
 
-The LDA model performs exceptionally well scoring precision and recall values of around 0.98 on synthetic data. This is to be expected, as the model itself generated the data. Therefore, there is only a small amount of randomness from the sampling procedure that prevents the model from achieving an accuracy of 100\%. However, applying the same model to real-world data reveals that this performance does not translate well. The topics \texttt{thanksgiving} and \texttt{covid19} in particular seem to be hard to classify by the model as they have the lowest precision and recall values of all topics. The topic \texttt{formula1}, on the other hand, seems to be the easiest to classify, as around 55.8\% of the models \texttt{formula1} predictions are correct (precision) and the model is able to identify more than half of the \texttt{formula1} related tweets (recall = 0.562). This model achieves an accuracy of $\approx 98\%$ on synthetic and $\approx 34\%$ on real data.
+The LDA model performs exceptionally well scoring precision and recall values of around 0.98 on synthetic data. This is to be expected, as the model itself generated the data. Therefore, there is only a small amount of randomness from the sampling procedure that prevents the model from achieving an accuracy of 100\%. However, applying the same model to real-world data reveals that this performance does not translate well. The topics \texttt{thanksgiving} and \texttt{covid19} in particular seem to be hard to classify by the model as they have the lowest precision and recall values of all topics. The topic \texttt{formula1}, on the other hand, seems to be the easiest to classify, as around 55.8\% of the models \texttt{formula1} predictions are correct (precision) and the model is able to identify more than half of the \texttt{formula1} related tweets (recall = 0.562).
+This model achieves an accuracy of $\approx 98\%$ on synthetic and $\approx 34\%$ on real data.
+
 \begin{center}
 \input{./benchmark_outputs/lda_classificationreport_synthdata.tex}
 \qquad
 \input{./benchmark_outputs/lda_classificationreport_realdata.tex}
 \end{center}
 \begin{center}
-Table 1 \& 2: Benchmark results of LDA model on synthetic data (left) and real data (right)
+Tables 3 \& 4: Benchmark results of LDA model on synthetic data (left) and real data (right)
 \end{center}
 
 \subsection{Neural Networks}
@@ -129,71 +129,78 @@ The model achieves an accuracy of $\approx 95\%$ on synthetic and $\approx 35\%$
 \input{./benchmark_outputs/synth_only_model_classificationreport_realdata.tex}
 \end{center}
 \begin{center}
-Table 3 \& 4: Benchmark results of neural net (trained on synthetic data only) on synthetic data (left) and real data (right)
+Tables 5 \& 6: Benchmark results of neural net (trained on synthetic data only) 
+
+on synthetic data (left) and real data (right)
 \end{center}
 
-
-
-
 \subsubsection{Training on Synthetic Data and Real Data}
-Next, we assess the predictive performance of a model that has been trained on the synthetic data set first, and then continues training on the real data set. While its performance on the synthetic data after finishing the training is worse than the models discussed before, it outperforms them on the real data set achieving consistently good performance across all topics. The model achieves an accuracy of $\approx 51\%$ on synthetic and $\approx 83\%$ on real data.
+Next, we assess the predictive performance of a model that has been trained on the synthetic data set first, and then continues training on the real data set. While its performance on the synthetic data after finishing the training is noticeably worse than the models discussed before, it outperforms them on the real data set achieving consistently good performance across all topics.
+The model achieves an accuracy of $\approx 51\%$ on synthetic and $\approx 83\%$ on real data.
+
 \begin{center}
 \input{./benchmark_outputs/synthandreal_model_classificationreport_synthdata.tex}
 \qquad
 \input{./benchmark_outputs/synthandreal_model_classificationreport_realdata.tex}
 \end{center}
 \begin{center}
-Table 3 \& 4: Benchmark results of neural net (trained on synthetic data 
+Tables 7 \& 8: Benchmark results of neural net (trained on synthetic data 
 
 and real data) on synthetic data (left) and real data (right)
 \end{center}
 
-
 \subsubsection{Training on Real Data Only}
+Lastly, we evaluate the performance of the neural network model that is trained only on real data. While this model reaches the lowest predictive performance overall compared to the previous models on synthetic data, it generally performs the best on real data, achieving a slightly higher precision and recall value than the continued training model for most topics. The high performance on predicting topics in the real data set is consistent across all topics.
 The model achieves an accuracy of $\approx 42\%$ on synthetic and $\approx 84\%$ on real data.
+
 \begin{center}
 \input{./benchmark_outputs/justreal_model_classificationreport_synthdata.tex}
 \qquad
 \input{./benchmark_outputs/justreal_model_classificationreport_realdata.tex}
 \end{center}
 \begin{center}
-Table 5 \& 6: Benchmark results of neural net (trained on real data only)
+Tables 9 \& 10: Benchmark results of neural net (trained on real data only)
 
  on synthetic data (left) and real data (right)
 \end{center}
 
 
-\subsection{A Look at the Learned Word Embeddings}
-To verify that the neural network model has learned meaningful word embeddings, we feed it seven manually chosen words (one closely related to each topic, but never the name of the topic itself) and find the ten closest word in the embedding space using cosine similarity. We find that the word embeddings capture an impressive amount of meaning: The name of Formula 1 driver Lewis Hamilton is closest to other drivers' names as well as ``formula" and ``race". ``Barcelona" maps to other sports clubs that played in the Champions League. Similarly,  we observe that ``vaccine" is close to health- and covid-related words while ``Christmas" is similar to ``December" and ``festive". For ``Elon" and ``BTC" the closest words are coherent and refer to Tesla and Cryptocurrencies. Only ``turkey" is not clearly close to Thanksgiving, presumably as the topic \texttt{thanksgiving} has been hard to identify throughout the experiments. Nevertheless, the turkey emoji and ``november" are related tokens. It is interesting to note that various relevant emojis have been identified as closely-related to each topic word, which confirms our initial hypothesis that emojis can be as meaningful as other words.
+\subsubsection{A Look at the Learned Word Embeddings}
+To verify that the neural network model has learned meaningful word embeddings, we feed it seven manually chosen words (one closely related to each topic, but never the name of the topic itself) and find the ten closest word in the embedding space using cosine similarity. We find that the word embeddings capture an impressive amount of meaning: The name of Formula 1 driver Lewis Hamilton is closest to other drivers' names as well as ``formula" and ``race". ``Barcelona" maps to other sports clubs that plays in the Champions League. Similarly,  we observe that ``vaccine" is close to health- and covid-related words while ``Christmas" is similar to ``December" and ``festive". For ``Elon" and ``BTC" the closest words are coherent and refer to Tesla and Cryptocurrencies. Only words associated with ``turkey" are not clearly close to Thanksgiving, presumably as the topic \texttt{thanksgiving} has been hard to identify throughout the experiments. Nevertheless, the turkey emoji and ``November" are related tokens. It is interesting to note that various relevant emojis have been identified as closely-related to each topic word, which confirms our initial hypothesis that emojis can be as meaningful as word tokens.
 \\
 
 \begin{adjustbox}{width=\columnwidth,center}
 \input{embeddings_similar_words.tex}
 \end{adjustbox}
 \begin{center}
-	Table 9: Top 10 closest words in embedding space for seven examples.
+	Table 11: Top ten closest words in embedding space for seven examples.
 \end{center}
 
 % --------------------------------------------------------------------------------
+
 \section{Discussion}
-- NN synthonly \& LDA super similar (with same bad generalization)
-- Synthandreal \& realonly have similar real world performance
-- F1 and holiday seem to be different between synth data and real data (good acc on real data but bad on synth data)
+Our results indicate that model performance is determined by a combination of the type and quality of data the model is trained on and the expressiveness of the model. Our models that trained explicitly on synthetic data performed well on predicting synthetic test data but poorly on the real data, and vice versa. In addition, our more expressive neural networks performed better to varying extents than the LDA model in predicting topics in the real data.
 
+\subsection{Data Type and Quality}
+We observe a noticeable discrepancy between predictive performance of the models that were trained on different types of data (i.e. synthetic vs real). Specifically, the models trained on synthetic data perform better on synthetic data while performing poorly on real data. And similarly, the models trained on real data perform poorly on synthetic data. This can be partially explained by the LDA generative model being a bag-of-words model and, therefore, unable to preserve sentence structure and generate sequential data. In addition, the LDA model infers seven topics from our corpus, independently of the actual topic labels, and we had to manually match our predetermined labels to the inferred topics. The labelling process worked well for the more distinct topics (e.g. \texttt{formula1}, \texttt{tesla}), but turned out to not perfectly recreate the topics with more overlap with others (i.e. \texttt{covid19} with all other topics and \texttt{thanksgiving} with \texttt{holidays}). Therefore, the sampled synthetic data generated from our LDA model would be dissimilar from the real data, resulting the predictive performance on synthetic data to not generalize to real data and vice versa.
 \\[5pt]
+\noindent Here, we note that the two neural networks, one trained on synthetic followed by real data and the one trained only on real data exhibit similar performance on both the real holdout test data, as well as the synthetic holdout test data. This could be because continuing training on real data makes the model un-learn relationships in the artificial data set. This phenomenon is known as \emph{Catastrophic Forgetting} and is an ongoing area of research (e.g. \cite{kaushik2021understanding}). We have to add that for our example, the results indicate that the artificially generated data set and real data set seem to be slightly dissimilar. 
 
-% Mention catastrophic forgetting:
-\noindent While performing better on real data, the network that is trained on synthetic data first and then continues learning on real data has an inferior performance on synthetic data compared to all other models that were trained on the synthetic data set. Apparently, continuing training on real data makes the model un-learn relationships in the artificial data set. This phenomenon is known as \emph{Catastrophic Forgetting} and is an ongoing area of research (e.g. \cite{kaushik2021understanding}). We have to add that for our example, the results indicate that the artificially generated data set and real data set seem to be slightly dissimilar. This can be partly explained by the LDA being a bag-of-words model and therefore not generation sequential data. Moreover, we manually had to label the inferred topics, which worked well for the majority of topics, but turned out to not perfectly recreate the topics \texttt{covid19} and \texttt{thanksgiving}.
+\subsection{Model Expressiveness}
 
+When comparing the LDA and the neural network models trained on synthetic data, we observe that both these models perform equally and extremely well on the holdout dataset. This was expected as the LDA classifier should be able to easily learn the data it generated itself, while the neural network has strong expressive power to imitate and learn similar parameters as the LDA classifier. These two models exhibit similar poor performance on real data, despite some differing performances across topics. This is also to be expected as the LDA outputs an entire topic distribution for each document. From this topic distribution, we only assign the most prevalent topic as a label, which is a rather simple approach. Similarly, the neural network overfits on the synthetic training data, which does not generalize well as discussed above. To truly differentiate the LDA and the neural network, we compare the predictive performance on real data between the LDA and the neural network model trained exclusively on real data. From this comparison, we observe that the neural network strongly outperforms the LDA (i.e. 84\% accuracy vs 34\% respectively). This is because real world data is the ideal scenario for neural networks to learn complex sentence structures, and it becomes evident that a simple bag-of-words approach is an inferior method that is unable to utilize an essential component of the data, like the sentence structure. 
+\\[5pt]
+\noindent While the neural network is clearly the better method when comparing only performance, we cannot say that it is the strictly better method. The LDA is much simpler when comparing time to train, both from a computational as well as a human practical outlook. The LDA has no hyperparameters that need to be tuned or carefully managed, allowing a greater volume of data to be fed into the model train step. The neural network also demands far more resources. The LDA model took approximately 1.5 minutes to run on a CPU, whereas the neural network took around 22 minutes to train on a CPU, and three minutes on a Nvidia Tesla T4 GPU. This is in addition to other working difficulties when working with complex models, like unexplained poor performances that are platform variant, additional step implementation to control for overfit, and subjective decisions made during the design of the architecture. LDA is also a better choice in scenarios where parameter interpretation is important. The parameters learned by LDA are easily interpretable. Parameters such as probability of a word belonging to a particular topic are intuitive in meaning. The neural network is much more of a black box, and the individual weights of a perceptron have no human-understandable interpretation. 
 
 % --------------------------------------------------------------------------------
+
 \section{Conclusion}
-In this project, we collected data from twitter by scraping tweets for seven topics (hashtags). We used the data on these topics to build a generative model, benchmark its performance, and used it to generate synthetic data. Based on this synthetic data we trained several different neural networks. 
-Our results indicate that the simple LDA model generates data that might not fully align with real world tweeets. While the LDA excels when used on synthetic data, it fails to perform on the real data set. The same holds true for the neural network that has been trained on synthetic data only. However, the neural networks we built in in this project perform well on real data \emph{if they are trained on real data} achieving accuracies of around 84\%.
-
-For these neural networks we were able to show that the learned word embeddings managed to capture the expected word-topic relationships. Given the large number of unique words induced by slang and misspelled words that are common on Twitter, we still think training our own word embeddings over using a pre-trained set is adequate.
-
-Future work on this problem could explore different regularization techniques: We see that the neural networks achieve training accuracies of over 95\% on the training set, which does not fully reflect in their ability to generalize to the validation and test set.
+In this project, we collected data from Twitter by scraping tweets for seven topics (hashtags). We used the data on these topics to build a generative model, benchmark its performance, and used it to generate synthetic data. Based on this synthetic data we trained several different neural networks. 
+Our results indicate that the simple LDA model generates data that might not fully align with real world Tweets. While the LDA excels when used on synthetic data, it fails to perform on the real data set. The same holds true for the neural network that has been trained on synthetic data only. However, the neural networks we built in in this project perform well on real data \emph{if they are trained on real data} achieving accuracies of around 84\%.
+\\[5pt]
+\noindent For these neural networks we were able to show that the learned word embeddings managed to capture the expected word-topic relationships. Given the large number of unique words induced by slang and misspelled words that are common on Twitter, we still think training our own word embeddings over using a pre-trained set is adequate.
+\\[5pt]
+\noindent Future work on this problem could include experimenting with different generative models to produce synthetic data that more closely aligns with real data. In addition, we could also explore different regularization techniques: We see that the neural networks achieve training accuracies of over 95\% on the training set, which does not fully reflect in their ability to generalize to the validation and test set. 
 
 % --------------------------------------------------------------------------------
 \newpage
