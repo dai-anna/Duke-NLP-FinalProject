@@ -118,6 +118,17 @@ This model achieves an accuracy of $\approx 98\%$ on synthetic and $\approx 34\%
 Tables 3 \& 4: Benchmark results of LDA model on synthetic data (left) and real data (right)
 \end{center}
 
+\newpage
+\noindent To assess the LDA model qualitatively, we sample some words for three selected topics from the model. We see that the \texttt{formula1} topic is coherent, generating words that are mostly related to the sport (like gt, saudi, community, race, performance, and max). The same holds true for the \texttt{crypto} topic. The word ``number" appears multiple times as this is the token that replaced digits in the preprocessing, which is especially prevalent in crypto-related tweets (``+420\% return", ``10x your investment"). Only the samples for \texttt{tesla} don't fully seem to match the topic. We saw that the topics \texttt{tesla} and \texttt{crypto} are closely related, but this incoherent set of words might just be a bad random draw.
+\begin{center}
+	\input{lda_samples.tex}
+\end{center}
+\begin{center}
+Table X: Samples from LDA model for three selected topics
+\end{center}
+
+
+
 \subsection{Neural Networks}
 \subsubsection{Training on Synthetic Data Only}
 The neural network trained on synthetic data is almost able to achieve the same performance metrics as the LDA model, although it performs slightly worse for almost every topic. The generalization to real data, however, performs slightly better than the LDA, although it is noticeable that \texttt{formula1} and \texttt{holidays} seem to be the hardest topics to classify.
@@ -177,6 +188,8 @@ To verify that the neural network model has learned meaningful word embeddings, 
 \end{center}
 
 \subsection{Comparing Predictions}
+Finally, Figure X shows the predictions of both the LDA model and the neural network trained on real data only for two example tweets. These examples demonstrate another difference between the prediction these models make. The LDA model returns a distribution over topics, where the assumption is that a document can (and often times will) contain multiple topics to some extent. Therefore, it tends to assign high probabilities to multiple topics, over which we take the $argmax$ to generate a single label. On the other hand, the prediction of the neural network is more clearly focussed on one output, which is assumed to be the correct classification for a document. This behavior is encouraged by the Softmax function, which favours sparse activations. For the Tweet on the left, we see that the LDA and neural network agree that the most prevalent topic is \texttt{holidays}. On the right, however, the LDA detects multiple different topics, whereas the neural network is confident it is either \texttt{crypto} or \texttt{tesla} (two topics that are indeed quite similar), with \texttt{tesla} being the final prediction. Nonetheless, this example demonstrates that the LDA might have an advantage in detecting documents with multiple topics or documents that are hard to classify. Given that the task on hand is single-label classification, the $argmax$ function -- while necessary to generate a label -- destroys some valuable information.
+
 
 \begin{figure}[h!]
 \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{colored_predictions.png}
