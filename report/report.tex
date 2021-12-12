@@ -190,13 +190,14 @@ To verify that the neural network model has learned meaningful word embeddings, 
 
 
 % --------------------------------------------------------------------------------
+
 \section{Conclusion}
-In this project, we collected data from twitter by scraping tweets for seven topics (hashtags). We used the data on these topics to build a generative model, benchmark its performance, and used it to generate synthetic data. Based on this synthetic data we trained several different neural networks. 
-Our results indicate that the simple LDA model generates data that might not fully align with real world tweeets. While the LDA excels when used on synthetic data, it fails to perform on the real data set. The same holds true for the neural network that has been trained on synthetic data only. However, the neural networks we built in in this project perform well on real data \emph{if they are trained on real data} achieving accuracies of around 84\%.
-
-For these neural networks we were able to show that the learned word embeddings managed to capture the expected word-topic relationships. Given the large number of unique words induced by slang and misspelled words that are common on Twitter, we still think training our own word embeddings over using a pre-trained set is adequate.
-
-Future work on this problem could explore different regularization techniques: We see that the neural networks achieve training accuracies of over 95\% on the training set, which does not fully reflect in their ability to generalize to the validation and test set.
+In this project, we collected data from Twitter by scraping tweets for seven topics (hashtags). We used the data on these topics to build a generative model, benchmark its performance, and used it to generate synthetic data. Based on this synthetic data we trained several different neural networks. 
+Our results indicate that the simple LDA model generates data that might not fully align with real world Tweets. While the LDA excels when used on synthetic data, it fails to perform on the real data set. The same holds true for the neural network that has been trained on synthetic data only. However, the neural networks we built in in this project perform well on real data \emph{if they are trained on real data} achieving accuracies of around 84\%.
+\\[5pt]
+\noindent For these neural networks we were able to show that the learned word embeddings managed to capture the expected word-topic relationships. Given the large number of unique words induced by slang and misspelled words that are common on Twitter, we still think training our own word embeddings over using a pre-trained set is adequate.
+\\[5pt]
+\noindent Future work on this problem could include experimenting with different generative models to produce synthetic data that more closely aligns with real data. In addition, we could also explore different regularization techniques: We see that the neural networks achieve training accuracies of over 95\% on the training set, which does not fully reflect in their ability to generalize to the validation and test set. 
 
 % --------------------------------------------------------------------------------
 \newpage
