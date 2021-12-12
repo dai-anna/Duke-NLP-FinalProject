@@ -70,9 +70,7 @@ if RETRAIN:
         bucket.upload_file(
             "../artefacts/lda_vectorizer.joblib", "artefacts/lda_vectorizer.joblib"
         )
-        bucket.upload_file(
-            "../artefacts/lda_model.joblib", "artefacts/lda_model.joblib"
-        )
+        bucket.upload_file("../artefacts/lda_model.joblib", "artefacts/lda_model.joblib")
         print("[INFO] LDA model and vectorizer saved to S3.")
 
 else:
@@ -121,6 +119,7 @@ lda_topic_real_topic_mapper = {
 # ----------------------------------- Generate Synthetic Data -----------------------------------
 GENERATE_DATA = False
 
+
 def generate_synthetic_data(n_samples_per_topic: int):
     tweet_length_distribution = train["tweet"].apply(lambda r: len(r.split())).values
 
@@ -138,6 +137,7 @@ def generate_synthetic_data(n_samples_per_topic: int):
             )
 
     return synth_data
+
 
 if GENERATE_DATA:
     synth_df = pd.DataFrame(
@@ -174,3 +174,22 @@ if GENERATE_DATA:
         bucket.upload_file("../data/synth_val.parquet", "data/synth_val.parquet")
         bucket.upload_file("../data/synth_test.parquet", "data/synth_test.parquet")
         print("[INFO] Synthetic data saved to S3.")
+
+
+#%%
+EXPORT_EXAMPLE_TABLE = True
+
+if EXPORT_EXAMPLE_TABLE:
+    _df = pd.DataFrame(
+        {
+            "Topic": ["Formula1", "Crypto", "Tesla"],
+            "Sampled": [
+                sample_from_topic(1, 10),
+                sample_from_topic(4, 10),
+                sample_from_topic(2, 10),
+            ],
+        }
+    ).set_index("Topic")
+    pd.options.display.max_colwidth = 100
+    print(_df)
+    _df.to_latex("../report/lda_samples.tex", index=True)
