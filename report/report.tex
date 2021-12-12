@@ -23,7 +23,7 @@ In this project, we work on tweet classification as a Natural Language Processin
 \section{Data}
 
 \subsection{Collection}
-We manually select seven popular topics (hashtags) for classification: \texttt{crypto}, \texttt{tesla}, \texttt{championsleague}, \texttt{formula1}, \texttt{thanksgiving}, \texttt{holidays}, and \texttt{covid19}. These topics were intentionally selected so that some topics have some degree of overlap between them (e.g. \texttt{holidays} and \texttt{thanksgiving}), others are easier to differentiate (e.g. \texttt{crypto} vs \texttt{formula1}), and one is an independent topic that is often mentioned with the others (i.e. \texttt{covid19}). We leverage the python library TWINT (\cite{twint}) to scrape approximately 10,000 Tweets, or documents, for each of these seven topics.
+We manually select seven popular topics (hashtags) for classification: \texttt{crypto}, \texttt{tesla}, \texttt{championsleague}, \texttt{formula1}, \texttt{thanksgiving}, \texttt{holidays}, and \texttt{covid19}. These topics were intentionally selected so that some topics have some degree of overlap between them (e.g. \texttt{holidays} and \texttt{thanksgiving}), others are easier to differentiate (e.g. \texttt{crypto} vs \texttt{formula1}), and one is an independent topic that is often mentioned with the others (i.e. \texttt{covid19}). We leverage the python library TWINT (\cite{twint}) as well as the Twitter API directly to scrape approximately 10,000 Tweets, or documents, for each of these seven topics.
 
 \subsection{Pre-Processing}
 
@@ -59,7 +59,6 @@ In this project, we have trained three discriminative models that are compared a
 \end{enumerate}
 
 
-
 \noindent We begin by tuning the models hyperparameters on the synthetic data set. The tuning is implemented using the optuna library (\cite{optunapaper}) and its implementation of Tree-structured Parzen Estimators, a sequential model-based optimization approach to intelligently exploring hyperparameter search spaces (\cite{bergstraTPE}). Each experiment is run for 50 trials (1 trial = one entire training run) due to time constraints. Each model is trained for 20 epochs, but we employ an early stopping mechanisms to stop training after 3 epochs without validation accuracy increase as, empirically, our models converged quickly and performance plateaued. The batch size for our experiments is fixed at 64. The learning rate is also kept at $10^{-2.5}$ for all experiments. This value was determined using the learning rate range test proposed by \cite{smith2018disciplined}. It works by fitting the model for a single epoch while changing the learning rate from small ($10^{-6}$) to large ($1$). Subsequently, we plot the loss over time, which hardly changes in the beginning of the epoch and diverges at the end of the epoch. The optimal learning rate can be visually identified close to the apex, i.e. the point where the loss decreases fastest.
 
 \begin{center}
@@ -76,12 +75,12 @@ In this project, we have trained three discriminative models that are compared a
 \end{tabular}
 \end{center}
 \begin{center}
-	Table X: Hyperparameters and their search spaces.
+	Table 1: Hyperparameters and their search spaces.
 \end{center}
 
-\noindent After finding the optimal hyperparameter configuration (shown in Table XX), we refit the model using the optimal parameters and benchmark its performance on the synthetic and real data. Subsequently, we continue training the same model on the real data set. We hypothesize that pre-training on synthetic data might help the model converge faster on real-world data. After training for another 20 epochs, we benchmark the model again.
+\noindent After finding the optimal hyperparameter configuration (shown in Table 2 below), we refit the model using the optimal parameters and benchmark its performance on the synthetic and real data. Subsequently, we continue training the same model on the real data set. We hypothesize that pre-training on synthetic data might help the model converge faster on real-world data. After training for another 20 epochs, we benchmark the model again.
 \\[5pt]
-\noindent To gauge whether pre-training on synthetic data had an impact on model performance or training behavior, we conduct another experiment. We start a new hyperparameter search with the same model architecture and search space, but this time on the real data set. We use the optimal parameters to create a third neural network model that has never seen synthetic data and benchmark it on both, the synthetic and real test set. Table XX shows the optimal parameter configurations found in each run.
+\noindent To gauge whether pre-training on synthetic data had an impact on model performance or training behavior, we conduct another experiment. We start a new hyperparameter search with the same model architecture and search space, but this time on the real data set. We use the optimal parameters to create a third neural network model that has never seen synthetic data and benchmark it on both, the synthetic and real test set. Table 2 shows the optimal parameter configurations found in each run.
 
 
 \begin{center}
@@ -98,7 +97,7 @@ In this project, we have trained three discriminative models that are compared a
 \end{tabular}
 \end{center}
 \begin{center}
-	Table XX: Optimal hyperparameter configuration for models on synthetic and real data
+	Table 2: Optimal hyperparameter configuration for models on synthetic and real data
 \end{center}
 
 % --------------------------------------------------------------------------------
@@ -115,7 +114,7 @@ This model achieves an accuracy of $\approx 98\%$ on synthetic and $\approx 34\%
 \input{./benchmark_outputs/lda_classificationreport_realdata.tex}
 \end{center}
 \begin{center}
-Table 1 \& 2: Benchmark results of LDA model on synthetic data (left) and real data (right)
+Tables 3 \& 4: Benchmark results of LDA model on synthetic data (left) and real data (right)
 \end{center}
 
 \subsection{Neural Networks}
@@ -129,7 +128,7 @@ The model achieves an accuracy of $\approx 95\%$ on synthetic and $\approx 35\%$
 \input{./benchmark_outputs/synth_only_model_classificationreport_realdata.tex}
 \end{center}
 \begin{center}
-Table 3 \& 4: Benchmark results of neural net (trained on synthetic data only) 
+Tables 5 \& 6: Benchmark results of neural net (trained on synthetic data only) 
 
 on synthetic data (left) and real data (right)
 \end{center}
@@ -144,7 +143,7 @@ The model achieves an accuracy of $\approx 51\%$ on synthetic and $\approx 83\%$
 \input{./benchmark_outputs/synthandreal_model_classificationreport_realdata.tex}
 \end{center}
 \begin{center}
-Table 3 \& 4: Benchmark results of neural net (trained on synthetic data 
+Tables 7 \& 8: Benchmark results of neural net (trained on synthetic data 
 
 and real data) on synthetic data (left) and real data (right)
 \end{center}
@@ -159,7 +158,7 @@ The model achieves an accuracy of $\approx 42\%$ on synthetic and $\approx 84\%$
 \input{./benchmark_outputs/justreal_model_classificationreport_realdata.tex}
 \end{center}
 \begin{center}
-Table 5 \& 6: Benchmark results of neural net (trained on real data only)
+Tables 9 \& 10: Benchmark results of neural net (trained on real data only)
 
  on synthetic data (left) and real data (right)
 \end{center}
@@ -173,7 +172,7 @@ To verify that the neural network model has learned meaningful word embeddings, 
 \input{embeddings_similar_words.tex}
 \end{adjustbox}
 \begin{center}
-	Table 9: Top 10 closest words in embedding space for seven examples.
+	Table 11: Top ten closest words in embedding space for seven examples.
 \end{center}
 
 % --------------------------------------------------------------------------------
