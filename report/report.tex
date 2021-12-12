@@ -124,7 +124,7 @@ Tables 3 \& 4: Benchmark results of LDA model on synthetic data (left) and real 
 	\input{lda_samples.tex}
 \end{center}
 \begin{center}
-Table X: Samples from LDA model for three selected topics
+Table 5: Samples from LDA model for three selected topics
 \end{center}
 
 
@@ -140,7 +140,7 @@ The model achieves an accuracy of $\approx 95\%$ on synthetic and $\approx 35\%$
 \input{./benchmark_outputs/synth_only_model_classificationreport_realdata.tex}
 \end{center}
 \begin{center}
-Tables 5 \& 6: Benchmark results of neural net (trained on synthetic data only) 
+Tables 6 \& 7: Benchmark results of neural net (trained on synthetic data only) 
 
 on synthetic data (left) and real data (right)
 \end{center}
@@ -155,7 +155,7 @@ The model achieves an accuracy of $\approx 51\%$ on synthetic and $\approx 83\%$
 \input{./benchmark_outputs/synthandreal_model_classificationreport_realdata.tex}
 \end{center}
 \begin{center}
-Tables 7 \& 8: Benchmark results of neural net (trained on synthetic data 
+Tables 8 \& 9: Benchmark results of neural net (trained on synthetic data 
 
 and real data) on synthetic data (left) and real data (right)
 \end{center}
@@ -170,7 +170,7 @@ The model achieves an accuracy of $\approx 42\%$ on synthetic and $\approx 84\%$
 \input{./benchmark_outputs/justreal_model_classificationreport_realdata.tex}
 \end{center}
 \begin{center}
-Tables 9 \& 10: Benchmark results of neural net (trained on real data only)
+Tables 10 \& 11: Benchmark results of neural net (trained on real data only)
 
  on synthetic data (left) and real data (right)
 \end{center}
@@ -184,11 +184,11 @@ To verify that the neural network model has learned meaningful word embeddings, 
 \input{embeddings_similar_words.tex}
 \end{adjustbox}
 \begin{center}
-	Table 11: Top ten closest words in embedding space for seven examples.
+	Table 12: Top ten closest words in embedding space for seven examples.
 \end{center}
 
 \subsection{Comparing Predictions}
-Finally, Figure X shows the predictions of both the LDA model and the neural network trained on real data only for two example tweets. These examples demonstrate another difference between the prediction these models make. The LDA model returns a distribution over topics, where the assumption is that a document can (and often times will) contain multiple topics to some extent. Therefore, it tends to assign high probabilities to multiple topics, over which we take the $argmax$ to generate a single label. On the other hand, the prediction of the neural network is more clearly focussed on one output, which is assumed to be the correct classification for a document. This behavior is encouraged by the Softmax function, which favours sparse activations. For the Tweet on the left, we see that the LDA and neural network agree that the most prevalent topic is \texttt{holidays}. On the right, however, the LDA detects multiple different topics, whereas the neural network is confident it is either \texttt{crypto} or \texttt{tesla} (two topics that are indeed quite similar), with \texttt{tesla} being the final prediction. Nonetheless, this example demonstrates that the LDA might have an advantage in detecting documents with multiple topics or documents that are hard to classify. Given that the task on hand is single-label classification, the $argmax$ function -- while necessary to generate a label -- destroys some valuable information.
+Finally, Figure 2 shows the predictions of both the LDA model and the neural network trained on real data only for two example Tweets. These examples demonstrate another difference between the prediction these models make. The LDA model returns a distribution over topics, where the assumption is that a document can (and often times will) contain multiple topics to some extent. Therefore, it tends to assign high probabilities to multiple topics, over which we take the $argmax(\cdot)$ to generate a single label. On the other hand, the prediction of the neural network is more clearly focused on one output, which is assumed to be the correct classification for a document. This behavior is encouraged by the Softmax function, which favors sparse activations. For the Tweet on the left, we see that the LDA and neural network agree that the most prevalent topic is \texttt{holidays}. On the right, however, the LDA detects multiple different topics, whereas the neural network is confident it is either \texttt{crypto} or \texttt{tesla} (two topics that are indeed quite similar), with \texttt{tesla} being the final prediction. Nonetheless, this example demonstrates that the LDA might have an advantage in detecting documents with multiple topics or documents that are hard to classify. Given that the task on hand is single-label classification, the $argmax(\cdot)$ function -- while necessary to generate a label -- destroys some valuable information.
 
 
 \begin{figure}[h!]
