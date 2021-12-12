@@ -1,12 +1,9 @@
 #%%
-from numpy.lib.utils import byte_bounds
 import pandas as pd
-import tensorflow as tf
 import torch.nn as nn
 import joblib
 from preprocessing_helpers import encode_dataframe
 import numpy as np
-from tensorflow import keras
 from tf_hyperparameter_tuning import get_compiled_model
 import os
 import matplotlib.pyplot as plt
@@ -107,7 +104,7 @@ print(f"#{GOOD_TWEET_IDX:05d}: {test.iloc[GOOD_TWEET_IDX]['tweet']}")
 
 #%%
 
-fig, axes = plt.subplots(2, 2, figsize=(20, 5))
+fig, axes = plt.subplots(2, 2, figsize=(20, 9))
 
 
 def plot_colored_predictions(ax, tweet_idx):
@@ -143,9 +140,9 @@ def plot_colored_predictions(ax, tweet_idx):
     ax.set_xticklabels(topiclabels, size=14, weight="normal")
 
 
-axes[0, 0].imshow(mpimg.imread("../report/colored_predictions.png"))
+axes[0, 0].imshow(mpimg.imread("../report/sampletweet2.png"))
 axes[0, 0].axis("off")
-axes[0, 1].imshow(mpimg.imread("../report/colored_predictions.png"))
+axes[0, 1].imshow(mpimg.imread("../report/sampletweet1.png"))
 axes[0, 1].axis("off")
 
 
