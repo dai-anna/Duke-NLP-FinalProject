@@ -51,7 +51,7 @@ python3 tf_train_model_with_best_params.py
 ```
 
 
-## Contributers
+## Contributors
 
 | Name | Reference |
 |---- | ----|
