@@ -51,5 +51,12 @@ python3 tf_train_model_with_best_params.py
 ```
 
 
+## Contributors
+
+| Name | Reference |
+|---- | ----|
+|Anna Dai | [GitHub Profile](https://github.com/dai-anna)|
+|Satvik Kishore| [GitHub Profile](https://github.com/satvikk)|
+|Moritz Wilksch |[GitHub Profile](https://github.com/moritzwilksch)|
 
 

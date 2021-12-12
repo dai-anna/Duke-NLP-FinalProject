@@ -188,7 +188,6 @@ To verify that the neural network model has learned meaningful word embeddings, 
 - AD: maybe mention somewhere that because of the limitations with the LDA generation, (where synth data does not necessarily infer the same topics) our synthetic data is quite different, therefore for each model, performance on synth data seems to be inverted correlated with performance on real data?
 - F1 and holiday seem to be different between synth data and real data (good acc on real data but bad on synth data)
 
-
 % Mention catastrophic forgetting:
 \noindent While performing better on real data, the network that is trained on synthetic data first and then continues learning on real data has an inferior performance on synthetic data compared to all other models that were trained on the synthetic data set. Apparently, continuing training on real data makes the model un-learn relationships in the artificial data set. This phenomenon is known as \emph{Catastrophic Forgetting} and is an ongoing area of research (e.g. \cite{kaushik2021understanding}). We have to add that for our example, the results indicate that the artificially generated data set and real data set seem to be slightly dissimilar. This can be partly explained by the LDA being a bag-of-words model and therefore not generation sequential data. Moreover, we manually had to label the inferred topics, which worked well for the majority of topics, but turned out to not perfectly recreate the topics \texttt{covid19} and \texttt{thanksgiving}.
 
