@@ -1,6 +1,5 @@
 \documentclass[11pt]{article}
-\usepackage{geometry}
-\geometry{margin=.94in}
+\usepackage[top=.85in, left=0.95in, bottom=.85in, right=0.95in]{geometry}
 \usepackage[OT1]{fontenc}
 \usepackage{booktabs}
 \usepackage{adjustbox}
@@ -20,6 +19,7 @@
 In this project, we work on tweet classification as a Natural Language Processing problem, more specifically, as a document classification problem. Twitter is a microblogging service where users post publicly visible ``Tweets", which are essentially texts with less than 280 characters. These Tweets may also contain other media objects which are discarded for the purposes of this project. These Tweets most often serve as discussion pieces as part of larger conversations. Tweets may be relevant to any number of topics under discussion, and these ``topics" are also often explicitly highlighted by the user using a ``hashtag", i.e. text with `\#' followed by the topic name, or a commonly used shorthand for it. For the purpose of our project, we treat these hashtags as ``topics" for our document classification model, where each Tweet is an instance of a document.
 
 % --------------------------------------------------------------------------------
+
 \section{Data}
 
 \subsection{Collection}
@@ -37,7 +37,7 @@ The raw scraped Tweets are quite messy as they are cluttered with media objects 
 \subsection{Generative Model}
 We use a Latent Dirichlet Allocation (LDA) model as a generative model to learn from the corpus we have collected. This type of model does not require any hyperparamter tuning, and thus is trained using a combination of the training and validation dataset. We used the LDA implementation from scikit-learn (\cite{sklearn}). It is fit to the corpus to infer seven separate topics, as this is the number of actual topics in the training set. Subsequently, for each inferred topic, we manually inspect the top 50 words that are associated with it in order to assign it a name or label. This manual step is necessary, as the order of topics is not preserved. In fact, the LDA model does not even guarantee to find the same topics that were collected in the original data set. This shortcoming will be discussed in the \emph{Results} and \emph{Conclusion} sections. 
 To use the LDA for document classification,  we let the model infer the topic distribution of each document in the test set and use the $argmax(\cdot)$ function to assign each document the topic that is most prevalent according to the LDA.
-Finally, the LDA is used to generate synthetic data. For each topic, we sample 10,000 artificial documents, the length of which is sampled from the empirical distribution of tweet lengths each time. Similar to the actual data set, the synthetic data set is also split into a train, validation, and test set using a 60/20/20 ratio split.
+Finally, the LDA is used to generate synthetic data. For each topic, we sample 10,000 artificial documents, the length of which is sampled from the empirical distribution of tweet lengths each time. Similar to the actual data, the synthetic data is also split in a 60/20/20 ratio into a train, validation, and test set.
 
 
 \subsection{Discriminative Model}
