@@ -1,4 +1,5 @@
 #%%
+from numpy.lib.utils import byte_bounds
 import pandas as pd
 import tensorflow as tf
 import torch.nn as nn
@@ -9,6 +10,7 @@ from tensorflow import keras
 from tf_hyperparameter_tuning import get_compiled_model
 import os
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 import seaborn as sns
 
 
@@ -64,14 +66,90 @@ cv = joblib.load("../artefacts/lda_vectorizer.joblib")
 lda = joblib.load("../artefacts/lda_model.joblib")
 
 #%%
-TWEET_IDX = 0
-TWEET_TEXT = test.iloc[TWEET_IDX]['tweet']
+lda_topic_real_topic_mapper = {
+    "0": "thanksgiving",  # bad, mixed with holidays, stock market, crypto
+    "1": "formula1",  # very good
+    "2": "covid",  # => general stock market?
+    "3": "championsleague",  # + covid19
+    "4": "crypto",  # good
+    "5": "tesla",  # good
+    "6": "holidays",  # + covid
+}
+
+
+nn_to_lda_topic_mapper = {
+    0: 3,
+    1: 2,
+    2: 4,
+    3: 1,
+    4: 6,
+    5: 5,
+    6: 0,
+}
+
+inverse_nn_to_lda_topic_mapper = {v: k for k, v in nn_to_lda_topic_mapper.items()}
+#%%
+BAD_TWEET_IDX = 4030
+GOOD_TWEET_IDX = 0
+
+print(f"{' BAD ':=^80}")
+print(f"#{BAD_TWEET_IDX:05d}: {test.iloc[BAD_TWEET_IDX]['tweet']}")
+print(f"{' GOOD ':=^80}")
+print(f"#{GOOD_TWEET_IDX:05d}: {test.iloc[GOOD_TWEET_IDX]['tweet']}")
+
+""" 
+===================================== BAD ======================================
+#04030: maximalist ai ml tech etc obsoleting jobs – bitcoin fixes bitcoin standard going radically change system – adapt get left behind
+===================================== GOOD =====================================
+#00000: know makes great holiday gifts books course got paperbacks delight voracious reader life visit amazon page peruse books pick paperback today
+"""
+
 
 #%%
-nn_pred = model.predict(xtest[TWEET_IDX].numpy().reshape(1, -1))
-lda_pred = lda.transform(cv.transform([TWEET_TEXT]))
-pred_mtx = np.vstack((nn_pred, lda_pred))
 
-#%%
-fig, ax = plt.subplots(figsize=(10, 3))
-sns.heatmap(np.round(pred_mtx, 3), square=True, annot=True, cmap="viridis", annot_kws=dict(size=16, weight="bold"))
+fig, axes = plt.subplots(2, 2, figsize=(20, 5))
+
+
+def plot_colored_predictions(ax, tweet_idx):
+    tweet_text = test.iloc[tweet_idx]["tweet"]
+    nn_pred = model.predict(xtest[tweet_idx].numpy().reshape(1, -1))
+    nn_pred = np.array(
+        [nn_pred.ravel()[inverse_nn_to_lda_topic_mapper[p]] for p in range(7)]
+    )
+    lda_pred = lda.transform(cv.transform([tweet_text]))
+    pred_mtx = np.vstack((nn_pred, lda_pred))
+
+    sns.heatmap(
+        np.round(pred_mtx, 3),
+        square=True,
+        annot=True,
+        cmap="coolwarm",
+        annot_kws=dict(size=16, weight="bold"),
+        cbar=False,
+        ax=ax,
+    )
+
+    topiclabels = [
+        "Thanks-\ngiving",
+        "Formula1",
+        "Covid19",
+        "Champions-\nleague",
+        "Crypto",
+        "Tesla",
+        "Holidays",
+    ]
+
+    ax.set_yticklabels(["NN", "LDA"], size=16, weight="bold")
+    ax.set_xticklabels(topiclabels, size=14, weight="normal")
+
+
+axes[0, 0].imshow(mpimg.imread("../report/colored_predictions.png"))
+axes[0, 0].axis("off")
+axes[0, 1].imshow(mpimg.imread("../report/colored_predictions.png"))
+axes[0, 1].axis("off")
+
+
+plot_colored_predictions(axes[1][0], GOOD_TWEET_IDX)
+plot_colored_predictions(axes[1][1], BAD_TWEET_IDX)
+plt.tight_layout()
+fig.savefig("../report/colored_predictions.png", facecolor="w", dpi=300, bbox_inches="tight")
