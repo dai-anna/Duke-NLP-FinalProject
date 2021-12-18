@@ -1,6 +1,6 @@
 # Duke NLP Final Project <img width=90 align="right" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Duke_University_logo.svg/1024px-Duke_University_logo.svg.png">
 
-We collect data on seven different topics on twitter to build an LDA model as well as a discriminative Neural Network to benchmark their perfomance in topic classification.
+We collect data on seven different topics on twitter to build an LDA model as well as a discriminative Neural Network to benchmark their performance in topic classification.
 
 ## Hashtags
 1) crypto
