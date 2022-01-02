@@ -2,6 +2,9 @@
 
 We collect data on seven different topics on twitter to build an LDA model as well as a discriminative Neural Network to benchmark their performance in topic classification.
 
+Read our final report [here](https://github.com/dai-anna/Duke-NLP-FinalProject/blob/884f2b059f1ed0d85f596d90068489be4c03bcec/report/report_submission_flat.pdf).
+
+
 ## Hashtags
 1) crypto
 2) tesla
